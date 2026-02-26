@@ -3,7 +3,7 @@ Mods for Elbody's Ffbot idle game
 
 May or may not ban you from leaderboards! 
 
-Forgot to remove the added trivia question as this was a mod for a friend - the answer is yes. 
+Forgot to remove the added trivia question as this was a mod for a friend - the answer is yes. Edit Trivia.ini to remove it and repackage if you feel strongly about this. 
 
 May play a sfx on game over (it wasn't working  when I packaged this, I'm working on it). 
 
