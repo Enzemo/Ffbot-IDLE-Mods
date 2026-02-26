@@ -1,0 +1,62 @@
+{
+	"artifacts": {
+		"system_active": false
+	},
+	"basic_stats": {
+		"attack": 9,
+		"hp": 28,
+		"level": 18,
+		"magic": 9,
+		"preferred_stat": "none",
+		"spirit": 9,
+		"wins": 1
+	},
+	"cards": {
+		"system_active": false
+	},
+	"character_info": {
+		"ascension_exp_bonus": 0,
+		"ascension_level": 0,
+		"awakening_exp": 0,
+		"awakening_level_specific": 2,
+		"unit": "Firion"
+	},
+	"collection": {
+		"collected": 1,
+		"percentage": 0,
+		"total": 129
+	},
+	"espers": {
+		"system_active": false
+	},
+	"free_hire": {
+		"available": false,
+		"current_count": 2,
+		"wins_until_available": 48
+	},
+	"mastery": {
+
+	},
+	"passives": {
+		"available_passives": [
+			{
+				"name": "Unknown",
+				"slot": 1,
+				"unlocked": false,
+				"wins_required": 100,
+				"wins_until_unlock": 98
+			},
+			{
+				"name": "Unknown",
+				"slot": 2,
+				"unlocked": false,
+				"wins_required": 200,
+				"wins_until_unlock": 198
+			}
+		],
+		"system_active": true
+	},
+	"player_name": "Enzemo",
+	"timestamp": "2026-02-26T21:22:27",
+	"unix_timestamp": 1772140947.467
+}
