@@ -7,7 +7,7 @@ May play a sfx on game over (it wasn't working  when I packaged this, I'm workin
 
 Currently generates two Json files with various information in the same location as exe. See releases for pck and example Json output. 
 
-An example html can be found here, this is simply an example of how the Jsons can be used. 
+An example html can be found here, this is simply an example of how the Jsons can be used. https://enzemo.github.io/Ffbot-IDLE-Mods/
 
 Wouldn't have been possible without this tool: https://dmitriysalnikov.itch.io/godot-pck-explorer
 
