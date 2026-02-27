@@ -1,7 +1,7 @@
 # Ffbot-IDLE-Mods
 Mods for Elbody's [FFBot Idle Game](https://elbody.itch.io/ffbot)
 
-**Disclaimer:** Use of these mods may or may not ban you from game leaderboards! **Always back up your original `ffbot.pck` before attempting to mod your game.**
+**Disclaimer:** Use of these mods may or may not ban you from game leaderboards! **Always back up your original `ffbot.pck` and save files before attempting to mod your game.**
 
 ## Project Overview
 This mod enhances the FFBot experience by providing real-time data exports and audio-visual feedback. It was made possible using the [Godot PCK Explorer](https://dmitriysalnikov.itch.io/godot-pck-explorer).
