@@ -13,6 +13,9 @@
 	#
 	#metuba_check()
 
+#additionally, you will want to call this function in func game_over(): too. 
+#I insert after update_battle_ui() 
+
 ## if you cannot find this, open an issue or download the latest release
 ## unpack and verify the table.md against your own
 
