@@ -1,6 +1,9 @@
 #Insert this code into your table.gd, before "func test():"
 #I will not provide Elbody's full source code myself
 
+#If an audio_debug.txt is generated, there was an error loading your sfx.
+#Check the text file for more details.
+
 # Variable to hold the loaded audio resource
 var LoadedMusic: AudioStream 
 
