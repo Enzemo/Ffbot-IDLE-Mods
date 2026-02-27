@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OBS - Game Session Overlay</title>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0);
+            color: #e2e8f0;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding: 10px;
+            text-shadow: 2px 2px 2px #000;
+            overflow: hidden;
+            width: 400px;
+        }
+        .panel {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #f43f5e;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .header { 
+            display: flex; justify-content: space-between; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 5px; margin-bottom: 8px;
+            font-weight: bold; color: #f43f5e; font-size: 0.9rem;
+        }
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 3px; }
+        .label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
+        .val { font-family: 'Courier New', monospace; font-weight: bold; }
+        
+        .progress-container { margin: 10px 0; }
+        .bar { height: 8px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+        .fill { height: 100%; background: #f43f5e; width: 0%; transition: width 1s ease; }
+        
+        .unit-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+            padding: 6px;
+            margin-top: 5px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="panel">
+    <div class="header"><span>SESSION INFO</span> <span id="g-time">00:00:00</span></div>
+    <div class="stat-row"><span class="label">Stage/Tier</span><span class="val">S<span id="g-stage">0</span>-T<span id="g-tier">0</span></span></div>
+    <div class="stat-row"><span class="label">Season</span><span id="g-season" class="val">-</span></div>
+    <div class="stat-row"><span class="label">NG+ Attempt</span><span id="g-ng" class="val">-</span></div>
+</div>
+
+<div class="panel" style="border-left-color: #fbbf24;">
+    <div class="header" style="color: #fbbf24;">BATTLE: <span id="g-boss">-</span></div>
+    <div class="progress-container">
+        <div class="stat-row"><span class="label">Wave Progress</span><span id="g-wave-text" class="val">0/0</span></div>
+        <div class="bar"><div id="wave-fill" class="fill" style="background: #fbbf24;"></div></div>
+    </div>
+    <div class="stat-row"><span class="label">Completion</span><span id="g-comp" class="val">0%</span></div>
+    <div class="stat-row"><span class="label">Enemies</span><span id="g-enemies" class="val">0</span></div>
+</div>
+
+<div class="panel" style="border-left-color: #38bdf8;">
+    <div class="header" style="color: #38bdf8;">RUN LOGISTICS</div>
+    <div class="stat-row"><span class="label">Active Passive</span><span id="g-passive" class="val">-</span></div>
+    <div class="stat-row"><span class="label">Hire Avail.</span><span id="g-hire-avail" class="val">-</span></div>
+    <div class="stat-row"><span class="label">Current Hire</span><span id="g-hire-name" class="val">-</span></div>
+</div>
+
+<div id="unit-area"></div>
+
+<script>
+    async function update() {
+        try {
+            const res = await fetch(`game_stats.json?t=${Date.now()}`);
+            const g = await res.json();
+
+            document.getElementById('g-time').innerText = g.battle_info.battle_time;
+            document.getElementById('g-stage').innerText = g.game_info.stage;
+            document.getElementById('g-tier').innerText = g.game_info.tier;
+            document.getElementById('g-season').innerText = g.game_info.season;
+            document.getElementById('g-ng').innerText = g.game_info.ng_plus_attempt;
+            
+            document.getElementById('g-boss').innerText = g.game_info.current_boss.toUpperCase();
+            document.getElementById('g-wave-text').innerText = `${g.wave_info.current_wave}/${g.wave_info.max_waves}`;
+            document.getElementById('wave-fill').style.width = g.wave_info.wave_progress_percent + '%';
+            document.getElementById('g-comp').innerText = g.progression.completion_rate + '%';
+            document.getElementById('g-enemies').innerText = g.battle_info.enemy_count;
+
+            document.getElementById('g-passive').innerText = g.run_info.current_passive || 'None';
+            document.getElementById('g-hire-avail').innerText = g.run_info.hire_system.hire_available;
+            document.getElementById('g-hire-name').innerText = g.run_info.hire_system.current_hire || 'N/A';
+
+            const units = g.player_details.map(u => `
+                <div class="unit-card">
+                    <div style="display:flex; justify-content:space-between">
+                        <strong>${u.name}</strong> <span>${u.hp_current} HP</span>
+                    </div>
+                    <div class="stat-row" style="margin-top:4px">
+                        <span class="label">${u.unit}</span> <span class="val">ATB: ${u.atb}%</span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('unit-area').innerHTML = units;
+        } catch (e) {}
+    }
+    setInterval(update, 3000);
+    update();
+</script>
+</body>
+</html>
