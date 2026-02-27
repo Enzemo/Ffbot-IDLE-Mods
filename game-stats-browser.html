@@ -2,112 +2,107 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OBS - Game Session Overlay</title>
+    <title>OBS - Advanced Game Session</title>
     <style>
-        body {
-            background-color: rgba(0, 0, 0, 0);
-            color: #e2e8f0;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0; padding: 10px;
-            text-shadow: 2px 2px 2px #000;
-            overflow: hidden;
-            width: 400px;
-        }
-        .panel {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-left: 4px solid #f43f5e;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-        .header { 
-            display: flex; justify-content: space-between; 
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 5px; margin-bottom: 8px;
-            font-weight: bold; color: #f43f5e; font-size: 0.9rem;
-        }
-        .stat-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 3px; }
-        .label { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
-        .val { font-family: 'Courier New', monospace; font-weight: bold; }
-        
-        .progress-container { margin: 10px 0; }
-        .bar { height: 8px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 4px; }
-        .fill { height: 100%; background: #f43f5e; width: 0%; transition: width 1s ease; }
-        
-        .unit-card {
-            background: rgba(0,0,0,0.3);
-            border-radius: 4px;
-            padding: 6px;
-            margin-top: 5px;
-            font-size: 0.8rem;
-        }
+        body { background: rgba(0,0,0,0); color: #e2e8f0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; text-shadow: 2px 2px 2px #000; width: 450px; overflow: hidden; }
+        .panel { background: rgba(15, 23, 42, 0.9); border-left: 4px solid #f43f5e; border-radius: 6px; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; margin-bottom: 6px; font-weight: bold; color: #f43f5e; font-size: 0.85rem; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+        .stat-item { font-size: 0.75rem; }
+        .label { color: #94a3b8; text-transform: uppercase; font-size: 0.65rem; display: block; }
+        .val { font-family: monospace; font-weight: bold; color: #fff; }
+        .bar-container { background: #334155; height: 6px; border-radius: 3px; overflow: hidden; margin: 4px 0; }
+        .fill { height: 100%; transition: width 1s; }
+        .unit-card { background: rgba(0,0,0,0.4); border-radius: 4px; padding: 6px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; }
+        .status-tag { display: inline-block; background: #475569; padding: 1px 4px; border-radius: 3px; font-size: 0.6rem; margin-right: 2px; }
     </style>
 </head>
 <body>
-
-<div class="panel">
-    <div class="header"><span>SESSION INFO</span> <span id="g-time">00:00:00</span></div>
-    <div class="stat-row"><span class="label">Stage/Tier</span><span class="val">S<span id="g-stage">0</span>-T<span id="g-tier">0</span></span></div>
-    <div class="stat-row"><span class="label">Season</span><span id="g-season" class="val">-</span></div>
-    <div class="stat-row"><span class="label">NG+ Attempt</span><span id="g-ng" class="val">-</span></div>
-</div>
-
-<div class="panel" style="border-left-color: #fbbf24;">
-    <div class="header" style="color: #fbbf24;">BATTLE: <span id="g-boss">-</span></div>
-    <div class="progress-container">
-        <div class="stat-row"><span class="label">Wave Progress</span><span id="g-wave-text" class="val">0/0</span></div>
-        <div class="bar"><div id="wave-fill" class="fill" style="background: #fbbf24;"></div></div>
+    <div class="panel">
+        <div class="header">WORLD STATE <span id="time">00:00:00</span></div>
+        <div class="stat-grid">
+            <div class="stat-item"><span class="label">Stage/Tier</span><span class="val">S<span id="stage">0</span>-T<span id="tier">0</span></span></div>
+            <div class="stat-item"><span class="label">Season/Cycle</span><span class="val">S<span id="season">0</span>-C<span id="cycle">0</span></span></div>
+            <div class="stat-item"><span class="label">NG+ (Att/Int)</span><span class="val"><span id="ng-a">0</span> / <span id="ng-i">0</span></span></div>
+        </div>
     </div>
-    <div class="stat-row"><span class="label">Completion</span><span id="g-comp" class="val">0%</span></div>
-    <div class="stat-row"><span class="label">Enemies</span><span id="g-enemies" class="val">0</span></div>
-</div>
 
-<div class="panel" style="border-left-color: #38bdf8;">
-    <div class="header" style="color: #38bdf8;">RUN LOGISTICS</div>
-    <div class="stat-row"><span class="label">Active Passive</span><span id="g-passive" class="val">-</span></div>
-    <div class="stat-row"><span class="label">Current Hire</span><span id="g-hire-name" class="val">-</span></div>
-</div>
+    <div class="panel" style="border-left-color: #fbbf24;">
+        <div class="header" style="color: #fbbf24;">BATTLE: <span id="boss">-</span></div>
+        <div class="stat-grid">
+            <div class="stat-item"><span class="label">Boss HP</span><span class="val" id="boss-hp">0/0</span></div>
+            <div class="stat-item"><span class="label">Wave</span><span class="val" id="wave-progress">0/0</span></div>
+            <div class="stat-item"><span class="label">Enemies/Actors</span><span class="val"><span id="enemies">0</span> / <span id="actors">0</span></span></div>
+        </div>
+        <div class="bar-container"><div id="wave-bar" class="fill" style="background: #fbbf24;"></div></div>
+        <div class="stat-grid" style="margin-top:5px;">
+            <div class="stat-item"><span class="label">Total Completion</span><span class="val" id="comp">0%</span></div>
+            <div class="stat-item"><span class="label">Waves Left</span><span class="val" id="wave-rem">0</span></div>
+            <div class="stat-item"><span class="label">Final Wave?</span><span class="val" id="final-wave">-</span></div>
+        </div>
+    </div>
 
-<div id="unit-area"></div>
+    <div class="panel" style="border-left-color: #38bdf8;">
+        <div class="header" style="color: #38bdf8;">RUN LOGISTICS</div>
+        <div class="stat-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="stat-item"><span class="label">Current Passive</span><span class="val" id="passive">-</span></div>
+            <div class="stat-item"><span class="label">Available Hire</span><span class="val"><span id="hire-name">-</span> (<span id="hire-price">0</span>)</span></div>
+        </div>
+        <div id="units"></div>
+    </div>
 
-<script>
-    async function update() {
-        try {
-            const res = await fetch(`game_stats.json?t=${Date.now()}`);
-            const g = await res.json();
+    <script>
+        async function update() {
+            try {
+                const res = await fetch(`game_stats.json?t=${Date.now()}`);
+                const g = await res.json();
+                
+                // Game Info
+                document.getElementById('time').innerText = g.battle_info.battle_time;
+                document.getElementById('stage').innerText = g.game_info.stage;
+                document.getElementById('tier').innerText = g.game_info.tier;
+                document.getElementById('season').innerText = g.game_info.season;
+                document.getElementById('cycle').innerText = g.game_info.cycle;
+                document.getElementById('ng-a').innerText = g.game_info.ng_plus_attempt;
+                document.getElementById('ng-i').innerText = g.game_info.ng_plus_internal;
 
-            document.getElementById('g-time').innerText = g.battle_info.battle_time;
-            document.getElementById('g-stage').innerText = g.game_info.stage;
-            document.getElementById('g-tier').innerText = g.game_info.tier;
-            document.getElementById('g-season').innerText = g.game_info.season;
-            document.getElementById('g-ng').innerText = g.game_info.ng_plus_attempt;
-            
-            document.getElementById('g-boss').innerText = g.game_info.current_boss.toUpperCase();
-            document.getElementById('g-wave-text').innerText = `${g.wave_info.current_wave}/${g.wave_info.max_waves}`;
-            document.getElementById('wave-fill').style.width = g.wave_info.wave_progress_percent + '%';
-            document.getElementById('g-comp').innerText = g.progression.completion_rate + '%';
-            document.getElementById('g-enemies').innerText = g.battle_info.enemy_count;
+                // Battle & Wave
+                document.getElementById('boss').innerText = g.game_info.current_boss.toUpperCase();
+                document.getElementById('boss-hp').innerText = `${g.battle_info.boss_hp_current}/${g.battle_info.boss_hp_max} (${g.battle_info.boss_hp_percent}%)`;
+                document.getElementById('wave-progress').innerText = `${g.wave_info.current_wave}/${g.wave_info.max_waves}`;
+                document.getElementById('enemies').innerText = g.battle_info.enemy_count;
+                document.getElementById('actors').innerText = g.actor_info.total_actors;
+                document.getElementById('wave-bar').style.width = g.wave_info.wave_progress_percent + '%';
+                document.getElementById('comp').innerText = g.progression.completion_rate + '%';
+                document.getElementById('wave-rem').innerText = g.wave_info.waves_remaining;
+                document.getElementById('final-wave').innerText = g.progression.is_final_wave ? "YES" : "NO";
 
-            document.getElementById('g-passive').innerText = g.run_info.current_passive || 'None';
-            document.getElementById('g-hire-avail').innerText = g.run_info.hire_system.hire_available;
-            document.getElementById('g-hire-name').innerText = g.run_info.hire_system.current_hire || 'N/A';
+                // Hire & Passive
+                document.getElementById('passive').innerText = g.run_info.current_passive;
+                document.getElementById('hire-name').innerText = g.run_info.hire_system.current_hire || "None";
+                document.getElementById('hire-price').innerText = g.run_info.hire_system.hire_price;
 
-            const units = g.player_details.map(u => `
-                <div class="unit-card">
-                    <div style="display:flex; justify-content:space-between">
-                        <strong>${u.name}</strong> <span>${u.hp_current} HP</span>
+                // Player Details
+                document.getElementById('units').innerHTML = g.player_details.map(u => `
+                    <div class="unit-card">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                            <strong>${u.name} (${u.unit})</strong>
+                            <span class="val">${u.hp_current}/${u.hp_max} HP (${u.hp_percent}%)</span>
+                        </div>
+                        <div class="stat-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="stat-item"><span class="label">Job</span><span class="val">${u.job || 'None'}</span></div>
+                            <div class="stat-item"><span class="label">ATB</span><span class="val">${u.atb}%</span></div>
+                            <div class="stat-item"><span class="label">LB</span><span class="val">${u.lb_charge}%</span></div>
+                        </div>
+                        <div class="stat-grid" style="grid-template-columns: 1.5fr 1fr; margin-top:2px;">
+                            <div class="stat-item"><span class="label">Equip (C/E)</span><span class="val">${u.card} / ${u.esper}</span></div>
+                            <div class="stat-item"><span class="label">Effects</span><span class="val">${u.status_effects.length > 0 ? u.status_effects.join(', ') : 'None'}</span></div>
+                        </div>
                     </div>
-                    <div class="stat-row" style="margin-top:4px">
-                        <span class="label">${u.unit}</span> <span class="val">ATB: ${u.atb}%</span>
-                    </div>
-                </div>
-            `).join('');
-            document.getElementById('unit-area').innerHTML = units;
-        } catch (e) {}
-    }
-    setInterval(update, 3000);
-    update();
-</script>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+        setInterval(update, 3000); update();
+    </script>
 </body>
 </html>
