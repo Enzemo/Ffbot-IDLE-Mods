@@ -43,6 +43,13 @@
             padding-bottom: 10px;
         }
 
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
         .btn {
             background: #38bdf8;
             color: #0f172a;
@@ -57,6 +64,13 @@
         }
 
         .btn:hover { background: #0ea5e9; }
+
+        .btn-dl {
+            background: #475569;
+            color: #f1f5f9;
+        }
+
+        .btn-dl:hover { background: #64748b; }
         
         .code-block {
             background: #000;
@@ -81,7 +95,7 @@
             <p style="color: #94a3b8; font-size: 0.95rem;">A compact, clean overlay showing current boss, time, wave progress, NG+ Level, and active party details.</p>
             <p><strong>OBS Dimensions:</strong> 320 x 250</p>
             
-            <div style="margin: 20px 0; display: flex; gap: 30px; align-items: center; background: #0f172a; padding: 15px; border-radius: 6px;">
+            <div style="margin: 20px 0; display: flex; gap: 20px; align-items: center; background: #0f172a; padding: 15px; border-radius: 6px; flex-wrap: wrap;">
                 <label style="display: flex; flex-direction: column; gap: 5px;">
                     <span style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: bold;">Background</span>
                     <input type="color" id="bgColor" value="#0f172a" style="border:none; width:70px; height:35px; cursor:pointer;">
@@ -90,13 +104,17 @@
                     <span style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: bold;">Accent Color</span>
                     <input type="color" id="accentColor" value="#38bdf8" style="border:none; width:70px; height:35px; cursor:pointer;">
                 </label>
-                <a id="previewLink" href="session-hud-browser.html" target="_blank" class="btn" style="background: #334155; color: white;">Open Live Preview</a>
+                
+                <div class="btn-group" style="margin-top: 0; align-items: flex-end; padding-bottom: 2px;">
+                    <a id="previewLink" href="session-hud-browser.html" target="_blank" class="btn" style="background: #334155; color: white;">Open Live Preview</a>
+                    <a href="session-hud-browser.html" download class="btn btn-dl">Download HTML</a>
+                </div>
             </div>
 
             <div style="background: #0f172a; padding: 15px; border-radius: 6px; border: 1px solid #38bdf8;">
                 <h4 style="margin: 0 0 10px 0; color: #38bdf8; font-size: 1rem;">OBS Local Integration Instructions</h4>
                 <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 10px; line-height: 1.5;">
-                    1. Add a Browser Source in OBS, check <strong>"Local file"</strong>, and browse to <strong>session-hud-browser.html</strong>.<br>
+                    1. Add a Browser Source in OBS, check <strong>"Local file"</strong>, and browse to your downloaded <strong>session-hud-browser.html</strong>.<br>
                     2. Uncheck "Local file" to reveal the full file URL path.<br>
                     3. Copy the string below and <strong>append (paste)</strong> it to the very end of the URL field in OBS.<br>
                     <span style="color: #94a3b8; font-size: 0.8rem;"><em>Example: file:///C:/Games/FFBot/session-hud-browser.html<strong>?bg=0f172a&accent=38bdf8</strong></em></span>
@@ -111,14 +129,20 @@
             <h2>Classic Game Stats</h2>
             <p style="color: #94a3b8; font-size: 0.95rem;">Large format overview of the active session.</p>
             <p><strong>OBS Dimensions:</strong> 450 x 650</p>
-            <a href="game-stats-browser.html" target="_blank" class="btn">Preview Game Stats</a>
+            <div class="btn-group">
+                <a href="game-stats-browser.html" target="_blank" class="btn">Preview Game Stats</a>
+                <a href="game-stats-browser.html" download class="btn btn-dl">Download HTML</a>
+            </div>
         </div>
 
         <div class="source-box">
             <h2>Player Profile Stats</h2>
             <p style="color: #94a3b8; font-size: 0.95rem;">Persistent character growth, collection, and passives.</p>
             <p><strong>OBS Dimensions:</strong> 380 x 550</p>
-            <a href="player-stats-browser.html" target="_blank" class="btn">Preview Player Stats</a>
+            <div class="btn-group">
+                <a href="player-stats-browser.html" target="_blank" class="btn">Preview Player Stats</a>
+                <a href="player-stats-browser.html" download class="btn btn-dl">Download HTML</a>
+            </div>
         </div>
     </div>
 
