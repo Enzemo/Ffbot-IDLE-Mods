@@ -20,6 +20,8 @@
 	#
 	#metuba_check()
 
+## if you cannot find this, open an issue or download the latest release
+## unpack and verify the table.md against your own
 
 # Variable for the writer node
 @onready var game_stats_writer = $"../game_stats_writer"
