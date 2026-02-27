@@ -8,31 +8,32 @@ This mod enhances the FFBot experience by providing real-time data exports and a
 
 Currently supports version **9.01** (latest at time of writing). I will attempt to keep this updated alongside game updates, but no promises can be made.
 
-## Features
+## Installation and Setup
 
-### 1. Audio Alerts
+### 1. Install the Mod (.pck)
+To apply the mod to your game, you must replace the default game data with the modified version:
+1. Go to the [Releases](https://github.com/enzemo/Ffbot-IDLE-Mods/releases) page.
+2. Download the latest `.pck` file.
+3. Open your FFBot game folder.
+4. Replace the existing `.pck` file with the one you just downloaded.
+
+### 2. Audio Alerts
 * **Game Over SFX**: Plays a sound when hitting a game over. 
 * **Requirement**: Include a `gameover.wav` in the same folder as the game executable. You can find an example file in the project releases.
 
-### 2. Data Export (JSON)
-The mod generates two JSON files in the same location as the executable:
+### 3. Data Export (JSON)
+Once the mod is running, it will automatically generate two JSON files in the same location as the executable:
 * **player_stats.json**: Persistent character data, core attributes (ATK, MAG, SPR), and growth metrics.
 * **game_stats.json**: Live session data, including current boss HP, wave progress, and party unit details.
 
-### 3. OBS Browser Sources
-Live examples of how this data can be visualized can be found here: [https://enzemo.github.io/Ffbot-IDLE-Mods/](https://enzemo.github.io/Ffbot-IDLE-Mods/) 
-
 ---
 
-## Installation and Setup
+## OBS Browser Sources
+Live examples of how this data can be visualized can be found here: [https://enzemo.github.io/Ffbot-IDLE-Mods/](https://enzemo.github.io/Ffbot-IDLE-Mods/)
 
-### Local Configuration
-1. Place `game-stats-browser.html`, `player-stats-browser.html`, and `index.html` into the same folder as your game executable.
-2. Ensure `gameover.wav` is present in that same directory for audio alerts.
-
-### OBS Integration
+### Integration Steps:
 1. Add a new **Browser Source** in OBS.
-2. Check the **Local File** box and browse to the desired HTML file.
+2. Check the **Local File** box and browse to the desired HTML file (e.g., `game-stats-browser.html`).
 3. Recommended dimensions:
     * **Game Stats Overlay**: 450 Width x 650 Height
     * **Player Stats Overlay**: 380 Width x 550 Height
@@ -50,7 +51,7 @@ Live examples of how this data can be visualized can be found here: [https://enz
 
 ### Live Session Data
 * **World State**: Displays Season, Cycle, Stage, Tier, and NG+ modifiers.
-* **Battle Progress**: Live tracking of Boss Name (e.g., Sweeper), Boss HP, and Wave completion percentage.
+* **Battle Progress**: Live tracking of Boss Name, Boss HP, and Wave completion percentage.
 * **Hire System**: Displays the currently available Hire (e.g., Vivi) and their price.
 * **Party Status**: Real-time ATB, LB Charge, and Status Effects for all active units.
 
@@ -60,4 +61,4 @@ Live examples of how this data can be visualized can be found here: [https://enz
 * `player-stats-browser.html`: Persistent character attribute overlay.
 * `player_stats.json`: Sample output of player data.
 * `game_stats.json`: Sample output of session data.
-* `gameover.wav`: Required file fo r audio alerts.
+* `gameover.wav`: Required file for  audio alerts.
