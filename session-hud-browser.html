@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OBS - Session HUD</title>
+    <style>
+        body {
+            background: rgba(0,0,0,0);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.8);
+            width: 320px;
+            overflow: hidden;
+        }
+
+        .hud-wrapper {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(4px);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+        }
+
+        .time-badge {
+            background: #38bdf8;
+            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .target-name {
+            font-weight: bold;
+            color: #fb7185;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 0.85rem;
+        }
+
+        .label {
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+        }
+
+        .val {
+            font-weight: 600;
+        }
+
+        /* Progress Bar */
+        .wave-container {
+            margin-top: 8px;
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fb7185, #f43f5e);
+            width: 0%;
+            transition: width 0.8s ease-out;
+        }
+
+        .footer-stats {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hud-wrapper">
+    <div class="main-header">
+        <span class="target-name" id="target">WAITING...</span>
+        <span class="time-badge" id="time">00:00</span>
+    </div>
+
+    <div class="wave-container">
+        <div class="row" style="margin-bottom: 0;">
+            <span class="label">Wave Progress</span>
+            <span class="val" id="wave-text">0 / 0</span>
+        </div>
+        <div class="bar-bg">
+            <div id="wave-bar" class="bar-fill"></div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+        <span class="label">Active Passive</span>
+        <span class="val" id="passive" style="color: #fbbf24;">-</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Current Hire</span>
+        <span class="val" id="hire" style="color: #4ade80;">-</span>
+    </div>
+
+    <div class="footer-stats">
+        <div>
+            <span class="label">Party</span>
+            <div class="val"><span id="players">0</span> Players</div>
+        </div>
+        <div style="text-align: right;">
+            <span class="label">Completion</span>
+            <div class="val" id="comp">0%</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function updateHUD() {
+        try {
+            const res = await fetch(`game_stats.json?t=${Date.now()}`);
+            const data = await res.json();
+
+            // Header & Target
+            document.getElementById('target').innerText = data.game_info.current_boss.toUpperCase();
+            document.getElementById('time').innerText = data.battle_info.battle_time;
+
+            // Wave
+            document.getElementById('wave-text').innerText = `${data.wave_info.current_wave} / ${data.wave_info.max_waves}`;
+            document.getElementById('wave-bar').style.width = data.wave_info.wave_progress_percent + '%';
+
+            // Logistics
+            document.getElementById('passive').innerText = data.run_info.current_passive || "None";
+            document.getElementById('hire').innerText = data.run_info.hire_system.current_hire || "None";
+            
+            // Stats
+            document.getElementById('players').innerText = data.game_info.players_in_run;
+            document.getElementById('comp').innerText = data.progression.completion_rate + '%';
+
+        } catch (e) {
+            console.error("HUD Update Error:", e);
+        }
+    }
+
+    setInterval(updateHUD, 2000);
+    updateHUD();
+</script>
+
+</body>
+</html>
