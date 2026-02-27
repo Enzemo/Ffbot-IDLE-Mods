@@ -1,3 +1,5 @@
+## Ensure this file is in the example folder when packing
+
 extends Node
 
 # File writer for game statistics
