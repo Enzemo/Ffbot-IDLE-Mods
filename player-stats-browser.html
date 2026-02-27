@@ -2,96 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OBS - Player Profile Overlay</title>
+    <title>OBS - Player Profile</title>
     <style>
-        body {
-            background-color: rgba(0, 0, 0, 0);
-            color: #f1f5f9;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0; padding: 10px;
-            text-shadow: 2px 2px 2px #000;
-            width: 350px;
-        }
-        .panel {
-            background: rgba(30, 41, 59, 0.8);
-            border-left: 4px solid #3b82f6;
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-        .title { font-weight: bold; color: #3b82f6; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 8px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8rem; }
+        body { background: rgba(0,0,0,0); color: #f1f5f9; font-family: sans-serif; margin: 0; padding: 10px; text-shadow: 2px 2px 2px #000; width: 350px; }
+        .panel { background: rgba(30, 41, 59, 0.85); border-left: 4px solid #3b82f6; border-radius: 4px; padding: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .title { font-weight: bold; color: #3b82f6; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 8px; font-size: 0.9rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem; }
         .label { color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; }
-        .val { font-weight: bold; color: white; }
-        
-        .system-badge {
-            font-size: 0.65rem; padding: 2px 6px; border-radius: 10px;
-            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-        }
-        .active { color: #4ade80; border-color: #4ade80; }
-        .inactive { color: #f87171; border-color: #f87171; }
+        .val { font-weight: bold; }
+        .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: #000; border: 1px solid #4ade80; color: #4ade80; margin-right: 4px; }
+        .locked { border-color: #f87171; color: #f87171; }
     </style>
 </head>
 <body>
-
-<div class="panel">
-    <div class="title" id="p-name">PLAYER PROFILE</div>
-    <div class="stat-grid">
-        <div><span class="label">Unit</span><br><span id="p-unit" class="val">-</span></div>
-        <div><span class="label">Level</span><br><span id="p-lvl" class="val">-</span></div>
-        <div><span class="label">Wins</span><br><span id="p-wins" class="val">-</span></div>
-        <div><span class="label">Spirit</span><br><span id="p-spr" class="val">-</span></div>
+    <div class="panel">
+        <div class="title" id="name">PLAYER PROFILE</div>
+        <div class="grid">
+            <div><span class="label">Unit</span><br><span id="unit" class="val">-</span></div>
+            <div><span class="label">Level</span><br><span id="lvl" class="val">-</span></div>
+            <div><span class="label">Wins</span><br><span id="wins" class="val">-</span></div>
+            <div><span class="label">Spirit</span><br><span id="spr" class="val">-</span></div>
+        </div>
     </div>
-</div>
 
-<div class="panel" style="border-left-color: #a855f7;">
-    <div class="title" style="color: #a855f7;">SYSTEMS & PROGRESS</div>
-    <div id="p-systems" style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;"></div>
-    <div class="label">Collection Progress</div>
-    <div style="font-size: 0.85rem; font-weight: bold;" id="p-col">-</div>
-</div>
+    <div class="panel" style="border-left-color: #a855f7;">
+        <div class="title" style="color: #a855f7;">SYSTEM STATUS</div>
+        <div id="systems" style="margin-bottom: 8px;"></div>
+        <div class="label">Collection</div>
+        <div class="val" id="col">-</div>
+    </div>
 
-<div class="panel" style="border-left-color: #10b981;">
-    <div class="title" style="color: #10b981;">PASSIVE ROADMAP</div>
-    <div id="p-roadmap" style="font-size: 0.75rem;"></div>
-</div>
+    <div class="panel" style="border-left-color: #10b981;">
+        <div class="title" style="color: #10b981;">PASSIVE UNLOCKS</div>
+        <div id="roadmap" style="font-size: 0.75rem;"></div>
+    </div>
 
-<script>
-    async function update() {
-        try {
-            const res = await fetch(`player_stats.json?t=${Date.now()}`);
-            const p = await pRes.json();
+    <script>
+        async function update() {
+            try {
+                // Ensure file is named player_stats.json
+                const res = await fetch(`player_stats.json?t=${Date.now()}`);
+                const p = await res.json();
+                
+                document.getElementById('name').innerText = p.player_name.toUpperCase();
+                document.getElementById('unit').innerText = p.character_info.unit;
+                document.getElementById('lvl').innerText = p.basic_stats.level;
+                document.getElementById('wins').innerText = p.basic_stats.wins;
+                document.getElementById('spr').innerText = p.basic_stats.spirit;
+                document.getElementById('col').innerText = `${p.collection.collected} / ${p.collection.total} (${p.collection.percentage}%)`;
 
-            document.getElementById('p-name').innerText = p.player_name.toUpperCase();
-            document.getElementById('p-unit').innerText = p.character_info.unit;
-            document.getElementById('p-lvl').innerText = p.basic_stats.level;
-            document.getElementById('p-wins').innerText = p.basic_stats.wins;
-            document.getElementById('p-spr').innerText = p.basic_stats.spirit;
-            document.getElementById('p-col').innerText = `${p.collection.collected} / ${p.collection.total} (${p.collection.percentage}%)`;
+                const sys = [
+                    {n: 'Art', a: p.artifacts.system_active}, 
+                    {n: 'Card', a: p.cards.system_active},
+                    {n: 'Esp', a: p.espers.system_active}, 
+                    {n: 'Pas', a: p.passives.system_active}
+                ];
+                document.getElementById('systems').innerHTML = sys.map(s => `<span class="badge ${s.a?'':'locked'}">${s.n}</span>`).join('');
 
-            const systems = [
-                {n: 'Art', a: p.artifacts.system_active},
-                {n: 'Card', a: p.cards.system_active},
-                {n: 'Esp', a: p.espers.system_active},
-                {n: 'Pas', a: p.passives.system_active}
-            ];
-            document.getElementById('p-systems').innerHTML = systems.map(s => 
-                `<span class="system-badge ${s.a ? 'active' : 'inactive'}">${s.n}</span>`
-            ).join('');
-
-            const roadmap = p.passives.available_passives.slice(0, 3).map(item => `
-                <div style="margin-bottom: 5px;">
-                    <div style="display:flex; justify-content:space-between">
-                        <span>Slot ${item.slot}</span>
-                        <span style="color:${item.unlocked ? '#4ade80':'#94a3b8'}">${item.unlocked ? 'UNLOCKED' : item.wins_until_unlock + ' to go'}</span>
+                document.getElementById('roadmap').innerHTML = p.passives.available_passives.map(i => `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span>Slot ${i.slot}</span>
+                        <span style="color:${i.unlocked?'#4ade80':'#94a3b8'}">${i.unlocked?'READY':i.wins_until_unlock+' to go'}</span>
                     </div>
-                </div>
-            `).join('');
-            document.getElementById('p-roadmap').innerHTML = roadmap;
-        } catch (e) {}
-    }
-    setInterval(update, 5000);
-    update();
-</script>
+                `).join('');
+            } catch (e) {
+                console.error("Error loading player_stats.json:", e);
+            }
+        }
+        setInterval(update, 5000); 
+        update();
+    </script>
 </body>
 </html>
