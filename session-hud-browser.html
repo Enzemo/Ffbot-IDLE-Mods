@@ -117,7 +117,7 @@
 
     <div class="row" style="margin-top: 12px;">
         <span class="label">NG+ Level</span>
-        <span class="val" id="ng-tier">-</span>
+        <span class="val" id="ng-cycle">-</span>
     </div>
 
     <div class="row">
@@ -148,13 +148,12 @@
 </div>
 
 <script>
-
-        async function updateHUD() {
+    async function updateHUD() {
         try {
             const res = await fetch(`game_stats.json?t=${Date.now()}`);
             const data = await res.json();
 
-            // Core Info
+            // Basic Info
             document.getElementById('target').innerText = data.game_info.current_boss.toUpperCase();
             document.getElementById('time').innerText = data.battle_info.battle_time;
             document.getElementById('wave-text').innerText = `${data.wave_info.current_wave} / ${data.wave_info.max_waves}`;
@@ -164,16 +163,12 @@
             document.getElementById('players').innerText = data.game_info.players_in_run;
             document.getElementById('comp').innerText = data.progression.completion_rate + '%';
 
-            // Fixed NG+ Logic
-            // We use || 0 to ensure that if the field is missing, it treats it as 0 before adding 1
-            const tierRaw = data.game_info.tier; 
-            const attemptRaw = data.game_info.ng_plus_attempt;
-
-            const tierVal = (parseInt(tierRaw) || 0) + 1;
-            const attemptVal = (parseInt(attemptRaw) || 0) + 1;
+            // NG+ Level (using cycle) and Attempt - Raw Values
+            const cycleVal = data.game_info.cycle;
+            const attemptVal = data.game_info.ng_plus_attempt;
             
-            document.getElementById('ng-tier').innerText = "Level " + tierVal;
-            document.getElementById('ng-attempt').innerText = "#" + attemptVal;
+            document.getElementById('ng-cycle').innerText = "Level " + (cycleVal !== undefined ? cycleVal : "-");
+            document.getElementById('ng-attempt').innerText = "#" + (attemptVal !== undefined ? attemptVal : "-");
 
         } catch (e) {
             console.error("HUD Error:", e);
@@ -182,7 +177,6 @@
 
     setInterval(updateHUD, 2000);
     updateHUD();
-
 </script>
 
 </body>
