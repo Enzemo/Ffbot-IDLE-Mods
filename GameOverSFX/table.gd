@@ -1,8 +1,16 @@
 #Insert this code into your table.gd, before "func test():"
 #I will not provide Elbody's full source code myself
-
+#
 #If an audio_debug.txt is generated, there was an error loading your sfx.
 #Check the text file for more details.
+#
+#Make sure you add play_game_over_sound() somewhere in the func game_over(): 
+#
+#i place it after update_battle_ui() 
+
+
+
+
 
 # Variable to hold the loaded audio resource
 var LoadedMusic: AudioStream 
