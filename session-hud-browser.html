@@ -7,7 +7,7 @@
         body {
             background: rgba(0,0,0,0);
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 10px;
             text-shadow: 2px 2px 3px rgba(0,0,0,0.8);
@@ -16,7 +16,7 @@
         }
 
         .hud-wrapper {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(4px);
             border-radius: 8px;
             padding: 12px;
@@ -70,11 +70,6 @@
             font-weight: 600;
         }
 
-        /* Progress Bar */
-        .wave-container {
-            margin-top: 8px;
-        }
-
         .bar-bg {
             width: 100%;
             height: 6px;
@@ -99,6 +94,11 @@
             border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 8px;
         }
+
+        .ng-plus {
+            color: #a855f7;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -109,7 +109,7 @@
         <span class="time-badge" id="time">00:00</span>
     </div>
 
-    <div class="wave-container">
+    <div>
         <div class="row" style="margin-bottom: 0;">
             <span class="label">Wave Progress</span>
             <span class="val" id="wave-text">0 / 0</span>
@@ -120,12 +120,17 @@
     </div>
 
     <div class="row" style="margin-top: 12px;">
-        <span class="label">Active Passive</span>
+        <span class="label">NG+ Level</span>
+        <span class="val ng-plus" id="ng-level">-</span>
+    </div>
+
+    <div class="row">
+        <span class="label">!passive</span>
         <span class="val" id="passive" style="color: #fbbf24;">-</span>
     </div>
 
     <div class="row">
-        <span class="label">Current Hire</span>
+        <span class="label">!hire</span>
         <span class="val" id="hire" style="color: #4ade80;">-</span>
     </div>
 
@@ -147,21 +152,18 @@
             const res = await fetch(`game_stats.json?t=${Date.now()}`);
             const data = await res.json();
 
-            // Header & Target
             document.getElementById('target').innerText = data.game_info.current_boss.toUpperCase();
             document.getElementById('time').innerText = data.battle_info.battle_time;
-
-            // Wave
             document.getElementById('wave-text').innerText = `${data.wave_info.current_wave} / ${data.wave_info.max_waves}`;
             document.getElementById('wave-bar').style.width = data.wave_info.wave_progress_percent + '%';
-
-            // Logistics
             document.getElementById('passive').innerText = data.run_info.current_passive || "None";
             document.getElementById('hire').innerText = data.run_info.hire_system.current_hire || "None";
-            
-            // Stats
             document.getElementById('players').innerText = data.game_info.players_in_run;
             document.getElementById('comp').innerText = data.progression.completion_rate + '%';
+
+            // NG+ Logic: Current attempt + 1
+            const ngVal = parseInt(data.game_info.ng_plus_attempt) + 1;
+            document.getElementById('ng-level').innerText = "Level " + ngVal;
 
         } catch (e) {
             console.error("HUD Update Error:", e);
@@ -174,3 +176,4 @@
 
 </body>
 </html>
+ 
