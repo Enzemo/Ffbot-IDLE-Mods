@@ -62,7 +62,7 @@ Live examples of how this data can be visualized can be found here: [https://enz
 ### Live Session Data
 * **World State**: Displays Season, Cycle, Stage, Tier, and NG+ modifiers.
 * **Battle Progress**: Live tracking of Boss Name, Boss HP, and Wave completion percentage.
-* **Hire System**: Displays the currently available Hire (e.g., Vivi) and their price.
+* **Hire System**: Displays the currently available Hire (e.g., Vivi).
 * **Party Status**: Real-time ATB, LB Charge, and Status Effects for all active units.
 
 ## Project Structure
