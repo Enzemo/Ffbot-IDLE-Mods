@@ -20,7 +20,7 @@ The mod generates two JSON files in the same location as the executable:
 * **game_stats.json**: Live session data, including current boss HP, wave progress, and party unit details.
 
 ### 3. OBS Browser Sources
-Live examples of how this data can be visualized can be found here: [https://enzemo.github.io/Ffbot-IDLE-Mods/](https://enzemo.github.io/Ffbot-IDLE-Mods/
+Live examples of how this data can be visualized can be found here: [https://enzemo.github.io/Ffbot-IDLE-Mods/](https://enzemo.github.io/Ffbot-IDLE-Mods/) 
 
 ---
 
