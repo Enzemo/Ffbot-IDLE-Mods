@@ -3,7 +3,7 @@ Mods for Elbody's Ffbot idle game
 
 May or may not ban you from leaderboards! 
 
-May play a sfx on game over (it wasn't working  when I packaged this, I'm working on it). 
+Plays a gameover sfx when ernding (Include a gameover.wav in the same folder as the exe, or take my example one from releases)
 
 Currently generates two Json files with various information in the same location as exe. See releases for pck and example Json output. 
 
