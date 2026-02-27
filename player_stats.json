@@ -3,60 +3,65 @@
 		"system_active": false
 	},
 	"basic_stats": {
-		"attack": 9,
-		"hp": 28,
-		"level": 18,
-		"magic": 9,
-		"preferred_stat": "none",
-		"spirit": 9,
-		"wins": 1
+		"attack": 360536,
+		"hp": 587555,
+		"level": 748365,
+		"magic": 269611,
+		"preferred_stat": "hp",
+		"spirit": 269319,
+		"wins": 1616
 	},
 	"cards": {
 		"system_active": false
 	},
 	"character_info": {
-		"ascension_exp_bonus": 0,
-		"ascension_level": 0,
-		"awakening_exp": 0,
-		"awakening_level_specific": 2,
-		"unit": "Firion"
+		"ascension_exp_bonus": 70,
+		"ascension_level": 35,
+		"awakening_exp": 44,
+		"awakening_level_specific": 1052,
+		"unit": "Galuf"
 	},
 	"collection": {
-		"collected": 1,
-		"percentage": 0,
-		"total": 129
+		"collected": 153,
+		"percentage": 100,
+		"total": 153
 	},
 	"espers": {
 		"system_active": false
 	},
 	"free_hire": {
-		"available": false,
-		"current_count": 2,
-		"wins_until_available": 48
+		"available": true,
+		"current_count": 281,
+		"wins_until_available": 0
 	},
 	"mastery": {
-
+		"m1": {
+			"ap": 4,
+			"ap_to_next": 36,
+			"display": "Warr",
+			"level": 2,
+			"name": "Warrior"
+		}
 	},
 	"passives": {
 		"available_passives": [
 			{
-				"name": "Unknown",
+				"name": "Tough",
 				"slot": 1,
-				"unlocked": false,
-				"wins_required": 100,
-				"wins_until_unlock": 98
+				"unlocked": true,
+				"wins_required": 100
 			},
 			{
-				"name": "Unknown",
+				"name": "Loyal",
 				"slot": 2,
-				"unlocked": false,
-				"wins_required": 200,
-				"wins_until_unlock": 198
+				"unlocked": true,
+				"wins_required": 200
 			}
 		],
+		"season5_passive": "Paralysis",
 		"system_active": true
 	},
-	"player_name": "Enzemo",
-	"timestamp": "2026-02-26T21:22:27",
-	"unix_timestamp": 1772140947.467
-}
+	"player_name": "Bakurraa",
+	"timestamp": "2026-02-27T16:26:46",
+	"unix_timestamp": 1772209606.057
+} 
