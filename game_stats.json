@@ -2,59 +2,57 @@
 	"actor_info": {
 		"actor_slots": [
 			1,
-			100,
-			101,
-			102
+			100
 		],
 		"has_boss": true,
-		"total_actors": 4
+		"total_actors": 2
 	},
 	"battle_info": {
 		"battle_ongoing": false,
-		"battle_time": "00:01:10",
-		"boss_hp_current": 12,
+		"battle_time": "00:02:38",
+		"boss_hp_current": 2480461,
 		"boss_hp_max": 0,
 		"boss_hp_percent": 0,
-		"enemy_count": 4,
+		"enemy_count": 2,
 		"player_count": 1
 	},
 	"game_info": {
-		"current_boss": "Sweeper",
-		"cycle": 1,
-		"ng_plus_attempt": 2,
-		"ng_plus_internal": 1,
+		"current_boss": "Klikk",
+		"cycle": 34,
+		"ng_plus_attempt": 35,
+		"ng_plus_internal": 34,
 		"players_in_run": 1,
 		"season": 5,
-		"stage": 2,
-		"tier": 30
+		"stage": 3,
+		"tier": 20315
 	},
 	"player_details": [
 		{
 			"atb": 0,
-			"card": "GiantRat",
-			"esper": "none",
-			"hp_current": 32,
+			"card": "Cactuar",
+			"esper": "Cactuar",
+			"hp_current": 587612,
 			"hp_max": 0,
 			"hp_percent": 0,
 			"job": "",
 			"lb_charge": 0,
-			"name": "Enzemo",
+			"name": "Bakurraa",
 			"passive": "",
 			"slot": 1,
 			"status_effects": [],
-			"unit": "Firion"
+			"unit": "Galuf"
 		}
 	],
 	"progression": {
-		"completion_rate": 4,
+		"completion_rate": 6,
 		"is_final_wave": false,
-		"waves_until_complete": 45
+		"waves_until_complete": 43
 	},
 	"run_info": {
 		"available_characters": null,
-		"current_passive": "Energetic",
+		"current_passive": "Battle Cry",
 		"hire_system": {
-			"current_hire": "Vivi",
+			"current_hire": "Margy",
 			"hire_available": true,
 			"hire_price": 0
 		},
@@ -67,12 +65,12 @@
 		"job_system": false,
 		"passive_system": true
 	},
-	"timestamp": "2026-02-26T21:23:19",
-	"unix_timestamp": 1772140999.445,
+	"timestamp": "2026-02-27T16:28:03",
+	"unix_timestamp": 1772209683.748,
 	"wave_info": {
-		"current_wave": 2,
-		"max_waves": 47,
-		"wave_progress_percent": 4,
-		"waves_remaining": 45
+		"current_wave": 3,
+		"max_waves": 46,
+		"wave_progress_percent": 6,
+		"waves_remaining": 43
 	}
-}
+} 
