@@ -2,141 +2,154 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enzemo // Game Command</title>
+    <title>Stream HUD Overlay</title>
     <style>
-        :root {
-            --bg: #0d1117; --card: #161b22; --border: #30363d;
-            --accent: #58a6ff; --text: #c9d1d9; --muted: #8b949e;
-            --success: #3fb950; --warning: #d29922; --danger: #f85149;
+        /* Transparent background for OBS */
+        body {
+            background-color: rgba(0, 0, 0, 0);
+            margin: 0;
+            padding: 15px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
         }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .dashboard { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1300px; margin: 0 auto; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-        h2 { font-size: 1.1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 0; }
-        h3 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin: 15px 0 10px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .stat-box { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; }
-        .label { display: block; font-size: 0.7rem; color: var(--muted); }
-        .val { font-weight: bold; font-family: monospace; }
-        .bar { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; margin: 8px 0; }
-        .fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s; }
-        .passive-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #21262d; }
-        .badge { padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; background: #21262d; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { text-align: left; color: var(--muted); padding: 8px; border-bottom: 1px solid var(--border); }
-        td { padding: 8px; border-bottom: 1px solid #21262d; }
+
+        .hud-container {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Glassmorphism look - readable over gameplay */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border-left: 4px solid #38bdf8;
+            border-radius: 4px;
+            padding: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+        }
+
+        .player-name { font-weight: bold; color: #38bdf8; font-size: 1.2rem; }
+        .lvl-badge { background: #38bdf8; color: #0f172a; padding: 1px 6px; border-radius: 3px; font-weight: 900; font-size: 0.8rem; }
+
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin: 3px 0; }
+        .label { color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; font-weight: bold; }
+        
+        /* Bars */
+        .bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); width: 0%; transition: width 1s ease; }
+        .bar-fill.wave { background: linear-gradient(90deg, #fb7185, #e11d48); }
+
+        .next-unlock {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        .boss-warning { color: #fb7185; font-weight: bold; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="dashboard">
-    <aside>
-        <section class="card">
-            <h2 id="p-name">Loading...</h2>
-            <div class="stat-grid">
-                <div class="stat-box"><span class="label">Unit</span><span id="p-unit" class="val">-</span></div>
-                <div class="stat-box"><span class="label">Level</span><span id="p-lvl" class="val">-</span></div>
-            </div>
-            <h3>Core Stats</h3>
-            <div class="stat-grid">
-                <div class="stat-box"><span class="label">HP</span><span id="p-hp" class="val">-</span></div>
-                <div class="stat-box"><span class="label">ATK</span><span id="p-atk" class="val">-</span></div>
-                <div class="stat-box"><span class="label">MAG</span><span id="p-mag" class="val">-</span></div>
-                <div class="stat-box"><span class="label">SPR</span><span id="p-spr" class="val">-</span></div>
-            </div>
-            <h3>Collection</h3>
-            <div class="bar"><div id="col-fill" class="fill"></div></div>
-            <div style="font-size: 0.75rem; text-align: right;" id="col-text">0 / 0</div>
-        </section>
-    </aside>
+<div class="hud-container">
+    <div class="glass-panel">
+        <div class="header">
+            <span class="player-name" id="p-name">Loading...</span>
+            <span class="lvl-badge">LVL <span id="p-lvl">0</span></span>
+        </div>
+        <div class="stat-row">
+            <span class="label">Unit</span>
+            <span id="p-unit">---</span>
+        </div>
+        <div class="stat-row">
+            <span class="label">ATK/MAG</span>
+            <span><span id="p-atk">0</span> / <span id="p-mag">0</span></span>
+        </div>
+    </div>
 
-    <main>
-        <section class="card">
-            <h2>Live Battle: vs <span id="g-boss">-</span></h2>
-            <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="stat-box"><span class="label">Stage</span><span id="g-stage" class="val">-</span></div>
-                <div class="stat-box"><span class="label">Wave</span><span id="g-wave" class="val">-</span></div>
-                <div class="stat-box"><span class="label">Time</span><span id="g-time" class="val">-</span></div>
-            </div>
-            <div class="bar" style="margin-top:20px;"><div id="wave-fill" class="fill"></div></div>
-        </section>
+    <div class="glass-panel" style="border-left-color: #fb7185;">
+        <div class="header">
+            <span style="font-size: 0.8rem; font-weight: bold;">STAGE <span id="g-stage">0</span> (T<span id="g-tier">0</span>)</span>
+            <span class="boss-warning" id="g-boss">BOSS</span>
+        </div>
+        <div class="stat-row">
+            <span class="label">Wave Progress</span>
+            <span id="g-wave-text" style="font-size: 0.75rem;">0/0</span>
+        </div>
+        <div class="bar-bg"><div id="wave-bar" class="bar-fill wave"></div></div>
+        <div class="stat-row" style="margin-top: 8px;">
+            <span class="label">Battle Time</span>
+            <span id="g-time">00:00</span>
+        </div>
+    </div>
 
-        <section class="card">
-            <h2>Passive Unlock Milestones</h2>
-            <div id="passives-list"></div>
-        </section>
-
-        <section class="card">
-            <h2>Current Party</h2>
-            <table>
-                <thead><tr><th>Name</th><th>Unit</th><th>Current HP</th><th>ATB</th><th>Passive</th></tr></thead>
-                <tbody id="party-list"></tbody>
-            </table>
-        </section>
-    </main>
+    <div class="glass-panel" style="border-left-color: #fbbf24;">
+        <div class="label" style="margin-bottom: 5px; display: block;">Next Passive Unlock</div>
+        <div class="next-unlock" id="p-unlock-area">
+            Wins needed: <span id="p-req" style="color: #fbbf24; font-weight: bold;">--</span>
+        </div>
+    </div>
 </div>
 
 <script>
-async function loadDashboard() {
-    try {
-        const [pRes, gRes] = await Promise.all([fetch('player_stats.json'), fetch('game_stats.json')]);
-        const p = await pRes.json();
-        const g = await gRes.json();
+    async function updateHUD() {
+        try {
+            // Adding a timestamp to the URL prevents the browser from caching the files
+            const ts = new Date().getTime();
+            const [pRes, gRes] = await Promise.all([
+                fetch(`player_stats.json?t=${ts}`),
+                fetch(`game_stats.json?t=${ts}`)
+            ]);
 
-        // Player Section
-        document.getElementById('p-name').textContent = p.player_name;
-        document.getElementById('p-unit').textContent = p.character_info.unit;
-        document.getElementById('p-lvl').textContent = p.basic_stats.level;
-        document.getElementById('p-hp').textContent = p.basic_stats.hp;
-        document.getElementById('p-atk').textContent = p.basic_stats.attack;
-        document.getElementById('p-mag').textContent = p.basic_stats.magic;
-        document.getElementById('p-spr').textContent = p.basic_stats.spirit;
+            const p = await pRes.json();
+            const g = await gRes.json();
 
-        const cPerc = (p.collection.collected / p.collection.total) * 100;
-        document.getElementById('col-fill').style.width = cPerc + '%';
-        document.getElementById('col-text').textContent = `${p.collection.collected} / ${p.collection.total} Items`;
+            // Player Data
+            document.getElementById('p-name').innerText = p.player_name;
+            document.getElementById('p-lvl').innerText = p.basic_stats.level;
+            document.getElementById('p-unit').innerText = p.character_info.unit;
+            document.getElementById('p-atk').innerText = p.basic_stats.attack;
+            document.getElementById('p-mag').innerText = p.basic_stats.magic;
 
-        // Game Section
-        document.getElementById('g-boss').textContent = g.game_info.current_boss;
-        document.getElementById('g-stage').textContent = g.game_info.stage;
-        document.getElementById('g-wave').textContent = `${g.wave_info.current_wave}/${g.wave_info.max_waves}`;
-        document.getElementById('g-time').textContent = g.battle_info.battle_time;
-        document.getElementById('wave-fill').style.width = g.wave_info.wave_progress_percent + '%';
+            // Game/Battle Data
+            document.getElementById('g-stage').innerText = g.game_info.stage;
+            document.getElementById('g-tier').innerText = g.game_info.tier;
+            document.getElementById('g-boss').innerText = g.game_info.current_boss.toUpperCase();
+            document.getElementById('g-time').innerText = g.battle_info.battle_time;
+            document.getElementById('g-wave-text').innerText = `${g.wave_info.current_wave} / ${g.wave_info.max_waves}`;
+            document.getElementById('wave-bar').style.width = g.wave_info.wave_progress_percent + '%';
 
-        // Passives Section
-        const pList = document.getElementById('passives-list');
-        p.passives.available_passives.forEach(item => {
-            const prog = (p.basic_stats.wins / item.wins_required) * 100;
-            pList.innerHTML += `
-                <div class="passive-row">
-                    <div style="flex:1">
-                        <strong>Slot ${item.slot}: ${item.name}</strong>
-                        <div class="bar" style="width: 80%; height: 4px;"><div class="fill" style="width:${prog}%"></div></div>
-                    </div>
-                    <div class="badge">${item.wins_until_unlock} wins remaining</div>
-                </div>`;
-        });
+            // Passive Progress (Find the first locked passive)
+            const nextP = p.passives.available_passives.find(item => !item.unlocked);
+            if(nextP) {
+                document.getElementById('p-req').innerText = nextP.wins_until_unlock;
+            } else {
+                document.getElementById('p-unlock-area').innerText = "All Slots Unlocked!";
+            }
 
-        // Party Section
-        const party = document.getElementById('party-list');
-        g.player_details.forEach(unit => {
-            party.innerHTML += `
-                <tr>
-                    <td><strong>${unit.name}</strong></td>
-                    <td>${unit.unit}</td>
-                    <td style="color:var(--success)">${unit.hp_current} HP</td>
-                    <td>${unit.atb}%</td>
-                    <td><span class="badge">${unit.passive || 'None'}</span></td>
-                </tr>`;
-        });
-
-    } catch (e) {
-        console.error(e);
-        document.body.innerHTML = `<div style="text-align:center; padding:50px;"><h2>Load Error</h2><p>Check that player_stats.json and game_stats.json are in this folder.</p></div>`;
+        } catch (e) {
+            console.log("Waiting for files...");
+        }
     }
-}
-loadDashboard();
+
+    // Refresh every 5 seconds
+    setInterval(updateHUD, 5000);
+    updateHUD();
 </script>
+
 </body>
 </html>
