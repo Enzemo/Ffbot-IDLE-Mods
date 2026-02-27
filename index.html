@@ -2,154 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Stream HUD Overlay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enzemo Game Overlays</title>
     <style>
-        /* Transparent background for OBS */
-        body {
-            background-color: rgba(0, 0, 0, 0);
-            margin: 0;
-            padding: 15px;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: white;
-            overflow: hidden;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
-        }
-
-        .hud-container {
-            width: 350px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        /* Glassmorphism look - readable over gameplay */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.8);
-            border-left: 4px solid #38bdf8;
-            border-radius: 4px;
-            padding: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 5px;
-            margin-bottom: 8px;
-        }
-
-        .player-name { font-weight: bold; color: #38bdf8; font-size: 1.2rem; }
-        .lvl-badge { background: #38bdf8; color: #0f172a; padding: 1px 6px; border-radius: 3px; font-weight: 900; font-size: 0.8rem; }
-
-        .stat-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin: 3px 0; }
-        .label { color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; font-weight: bold; }
-        
-        /* Bars */
-        .bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 5px; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); width: 0%; transition: width 1s ease; }
-        .bar-fill.wave { background: linear-gradient(90deg, #fb7185, #e11d48); }
-
-        .next-unlock {
-            font-size: 0.75rem;
-            background: rgba(0,0,0,0.3);
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px dashed rgba(255,255,255,0.2);
-        }
-
-        .boss-warning { color: #fb7185; font-weight: bold; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        body { font-family: sans-serif; background: #0f172a; color: #f1f5f9; padding: 40px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; background: #1e293b; padding: 30px; border-radius: 12px; }
+        h1 { color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+        .source-box { border: 1px solid #334155; padding: 20px; border-radius: 8px; margin: 20px 0; background: rgba(0,0,0,0.2); }
+        .btn { display: inline-block; padding: 10px 20px; background: #38bdf8; color: #0f172a; text-decoration: none; border-radius: 5px; font-weight: bold; margin-right: 10px; }
+        .btn-dl { background: #94a3b8; }
+        code { background: #000; padding: 2px 6px; border-radius: 4px; color: #fbbf24; }
+        .instructions { background: #0f172a; padding: 15px; border-radius: 6px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Stream Overlay Directory</h1>
+        
+        <div class="source-box">
+            <h2>game stats browser source</h2>
+            <p>Live session data including current boss, wave progress, and party status.</p>
+            <a href="game-stats-browser.html" class="btn">View Live Page</a>
+            <a href="game-stats-browser.html" download class="btn btn-dl">Download HTML</a>
+            <p><strong>OBS Dimensions:</strong> 400 x 650</p>
+        </div>
 
-<div class="hud-container">
-    <div class="glass-panel">
-        <div class="header">
-            <span class="player-name" id="p-name">Loading...</span>
-            <span class="lvl-badge">LVL <span id="p-lvl">0</span></span>
+        <div class="source-box">
+            <h2>player stats browser</h2>
+            <p>Persistent player profile showing core attributes, collection progress, and passive unlocks.</p>
+            <a href="player-stats-browser.html" class="btn">View Live Page</a>
+            <a href="player-stats-browser.html" download class="btn btn-dl">Download HTML</a>
+            <p><strong>OBS Dimensions:</strong> 350 x 550</p>
         </div>
-        <div class="stat-row">
-            <span class="label">Unit</span>
-            <span id="p-unit">---</span>
-        </div>
-        <div class="stat-row">
-            <span class="label">ATK/MAG</span>
-            <span><span id="p-atk">0</span> / <span id="p-mag">0</span></span>
-        </div>
-    </div>
 
-    <div class="glass-panel" style="border-left-color: #fb7185;">
-        <div class="header">
-            <span style="font-size: 0.8rem; font-weight: bold;">STAGE <span id="g-stage">0</span> (T<span id="g-tier">0</span>)</span>
-            <span class="boss-warning" id="g-boss">BOSS</span>
-        </div>
-        <div class="stat-row">
-            <span class="label">Wave Progress</span>
-            <span id="g-wave-text" style="font-size: 0.75rem;">0/0</span>
-        </div>
-        <div class="bar-bg"><div id="wave-bar" class="bar-fill wave"></div></div>
-        <div class="stat-row" style="margin-top: 8px;">
-            <span class="label">Battle Time</span>
-            <span id="g-time">00:00</span>
+        <div class="instructions">
+            <h3>Installation Instructions</h3>
+            <ol>
+                <li>Download the HTML files above and place them in the <strong>same folder</strong> as <code>player_stats.json</code> and <code>game_stats.json</code>.</li>
+                <li>In OBS, add a new <strong>Browser Source</strong>.</li>
+                <li>Check <strong>"Local file"</strong> and browse to the HTML file you want to use.</li>
+                <li>Set the width and height to the <strong>OBS Dimensions</strong> listed above.</li>
+                <li>(Optional) Set the "Refresh Browser when source becomes active" option if you want a clean start each time.</li>
+            </ol>
         </div>
     </div>
-
-    <div class="glass-panel" style="border-left-color: #fbbf24;">
-        <div class="label" style="margin-bottom: 5px; display: block;">Next Passive Unlock</div>
-        <div class="next-unlock" id="p-unlock-area">
-            Wins needed: <span id="p-req" style="color: #fbbf24; font-weight: bold;">--</span>
-        </div>
-    </div>
-</div>
-
-<script>
-    async function updateHUD() {
-        try {
-            // Adding a timestamp to the URL prevents the browser from caching the files
-            const ts = new Date().getTime();
-            const [pRes, gRes] = await Promise.all([
-                fetch(`player_stats.json?t=${ts}`),
-                fetch(`game_stats.json?t=${ts}`)
-            ]);
-
-            const p = await pRes.json();
-            const g = await gRes.json();
-
-            // Player Data
-            document.getElementById('p-name').innerText = p.player_name;
-            document.getElementById('p-lvl').innerText = p.basic_stats.level;
-            document.getElementById('p-unit').innerText = p.character_info.unit;
-            document.getElementById('p-atk').innerText = p.basic_stats.attack;
-            document.getElementById('p-mag').innerText = p.basic_stats.magic;
-
-            // Game/Battle Data
-            document.getElementById('g-stage').innerText = g.game_info.stage;
-            document.getElementById('g-tier').innerText = g.game_info.tier;
-            document.getElementById('g-boss').innerText = g.game_info.current_boss.toUpperCase();
-            document.getElementById('g-time').innerText = g.battle_info.battle_time;
-            document.getElementById('g-wave-text').innerText = `${g.wave_info.current_wave} / ${g.wave_info.max_waves}`;
-            document.getElementById('wave-bar').style.width = g.wave_info.wave_progress_percent + '%';
-
-            // Passive Progress (Find the first locked passive)
-            const nextP = p.passives.available_passives.find(item => !item.unlocked);
-            if(nextP) {
-                document.getElementById('p-req').innerText = nextP.wins_until_unlock;
-            } else {
-                document.getElementById('p-unlock-area').innerText = "All Slots Unlocked!";
-            }
-
-        } catch (e) {
-            console.log("Waiting for files...");
-        }
-    }
-
-    // Refresh every 5 seconds
-    setInterval(updateHUD, 5000);
-    updateHUD();
-</script>
-
 </body>
-</html>
+</html> 
