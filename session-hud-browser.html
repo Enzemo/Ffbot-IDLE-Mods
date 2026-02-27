@@ -160,45 +160,50 @@
 </div>
 
 <script>
-    // Theme logic: Grabs ?bg=XXXXXX&accent=XXXXXX from the URL
     const urlParams = new URLSearchParams(window.location.search);
-    if(urlParams.has('bg')) {
-        document.documentElement.style.setProperty('--bg-color', '#' + urlParams.get('bg'));
+    if(urlParams.has('bg')) document.documentElement.style.setProperty('--bg-color', '#' + urlParams.get('bg'));
+    if(urlParams.has('accent')) document.documentElement.style.setProperty('--accent-color', '#' + urlParams.get('accent'));
+
+    function updateHUD() {
+        const xhr = new XMLHttpRequest();
+        // The ?t= timestamp prevents OBS from showing a cached/old version of the JSON
+        xhr.open("GET", "game_stats.json?t=" + Date.now(), true);
+        
+        xhr.onload = function () {
+            if (xhr.status === 200 || (xhr.status === 0 && xhr.responseText)) {
+                try {
+                    const data = JSON.parse(xhr.responseText);
+
+                    // Update UI
+                    document.getElementById('target').innerText = data.game_info.current_boss.toUpperCase();
+                    document.getElementById('time').innerText = data.battle_info.battle_time;
+                    document.getElementById('wave-text').innerText = `${data.wave_info.current_wave} / ${data.wave_info.max_waves}`;
+                    document.getElementById('wave-bar').style.width = data.wave_info.wave_progress_percent + '%';
+                    document.getElementById('passive').innerText = data.run_info.current_passive || "None";
+                    document.getElementById('hire').innerText = data.run_info.hire_system.current_hire || "None";
+                    document.getElementById('players').innerText = data.game_info.players_in_run;
+                    document.getElementById('comp').innerText = data.progression.completion_rate + '%';
+                    
+                    document.getElementById('ng-cycle').innerText = "Level " + (data.game_info.cycle ?? "-");
+                    document.getElementById('ng-attempt').innerText = "#" + (data.game_info.ng_plus_attempt ?? "-");
+                } catch (e) {
+                    console.error("JSON Parse Error:", e);
+                }
+            }
+        };
+
+        xhr.onerror = function () {
+            console.error("Failed to read game_stats.json. Ensure the file is in the same folder as this HTML.");
+        };
+
+        xhr.send();
     }
-    if(urlParams.has('accent')) {
-        document.documentElement.style.setProperty('--accent-color', '#' + urlParams.get('accent'));
-    }
 
-    async function updateHUD() {
-        try {
-            const res = await fetch(`game_stats.json?t=${Date.now()}`);
-            const data = await res.json();
-
-            // Core Info
-            document.getElementById('target').innerText = data.game_info.current_boss.toUpperCase();
-            document.getElementById('time').innerText = data.battle_info.battle_time;
-            document.getElementById('wave-text').innerText = `${data.wave_info.current_wave} / ${data.wave_info.max_waves}`;
-            document.getElementById('wave-bar').style.width = data.wave_info.wave_progress_percent + '%';
-            document.getElementById('passive').innerText = data.run_info.current_passive || "None";
-            document.getElementById('hire').innerText = data.run_info.hire_system.current_hire || "None";
-            document.getElementById('players').innerText = data.game_info.players_in_run;
-            document.getElementById('comp').innerText = data.progression.completion_rate + '%';
-
-            // NG+ Level and Attempt - Using Raw Cycle/Attempt variables
-            const cycleVal = data.game_info.cycle;
-            const attemptVal = data.game_info.ng_plus_attempt;
-            
-            document.getElementById('ng-cycle').innerText = "Level " + (cycleVal !== undefined ? cycleVal : "-");
-            document.getElementById('ng-attempt').innerText = "#" + (attemptVal !== undefined ? attemptVal : "-");
-
-        } catch (e) {
-            console.error("HUD Error:", e);
-        }
-    }
-
+    // Update every 2 seconds
     setInterval(updateHUD, 2000);
     updateHUD();
 </script>
+
 
 </body>
 </html>
