@@ -148,7 +148,8 @@
 </div>
 
 <script>
-    async function updateHUD() {
+
+        async function updateHUD() {
         try {
             const res = await fetch(`game_stats.json?t=${Date.now()}`);
             const data = await res.json();
@@ -163,9 +164,13 @@
             document.getElementById('players').innerText = data.game_info.players_in_run;
             document.getElementById('comp').innerText = data.progression.completion_rate + '%';
 
-            // NG+ Display (Using Tier data but keeping NG+ Level name)
-            const tierVal = parseInt(data.game_info.current_tier) + 1;
-            const attemptVal = parseInt(data.game_info.ng_plus_attempt) + 1;
+            // Fixed NG+ Logic
+            // We use || 0 to ensure that if the field is missing, it treats it as 0 before adding 1
+            const tierRaw = data.game_info.tier; 
+            const attemptRaw = data.game_info.ng_plus_attempt;
+
+            const tierVal = (parseInt(tierRaw) || 0) + 1;
+            const attemptVal = (parseInt(attemptRaw) || 0) + 1;
             
             document.getElementById('ng-tier').innerText = "Level " + tierVal;
             document.getElementById('ng-attempt').innerText = "#" + attemptVal;
@@ -177,6 +182,7 @@
 
     setInterval(updateHUD, 2000);
     updateHUD();
+
 </script>
 
 </body>
