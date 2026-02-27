@@ -3,47 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <title>OBS - Session HUD</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OBS - Session HUD</title>
     <style>
         :root {
-            --bg-color: rgba(15, 23, 42, 0.9);
-            --accent-color: #38bdf8;
+            --bg-color: #0f172a; /* Fallback Slate */
+            --bg-alpha: 0.9;
+            --accent-color: #38bdf8; /* Fallback Sky Blue */
             --text-main: #f1f5f9;
         }
 
         body {
             background: rgba(0,0,0,0);
             color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 10px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            width: 320px; overflow: hidden;
+            width: 320px;
+            overflow: hidden;
         }
 
         .hud-wrapper {
-            background: var(--bg-color);
+            /* Combine background color with an opacity */
+            background: color-mix(in srgb, var(--bg-color) 90%, transparent);
             backdrop-filter: blur(8px);
             border-radius: 6px;
             padding: 14px;
-            border: 1px solid var(--accent-color);
+            border: 1px solid color-mix(in srgb, var(--accent-color) 30%, transparent);
             box-shadow: 0 8px 32px rgba(0,0,0,0.8);
         }
 
         .main-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 12px; border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 6px; opacity: 0.8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 2px solid color-mix(in srgb, var(--accent-color) 20%, transparent);
+            padding-bottom: 6px;
         }
 
-        .time-badge { color: var(--accent-color); font-family: monospace; font-weight: bold; font-size: 1rem; }
-        .target-name { font-weight: 800; color: var(--text-main); font-size: 1.1rem; text-transform: uppercase; }
-        .row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.85rem; align-items: center; }
-        .label { color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; font-weight: bold; }
-        .val { font-weight: bold; color: var(--accent-color); }
+        .time-badge {
+            color: var(--accent-color);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1rem;
+        }
 
-        .bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 4px; overflow: hidden; }
-        .bar-fill { height: 100%; background: var(--accent-color); width: 0%; transition: width 0.8s ease; box-shadow: 0 0 8px var(--accent-color); }
-        
-        .footer-stats { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--accent-color); padding-top: 10px; opacity: 0.5; }
+        .target-name {
+            font-weight: 800;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.85rem;
+            align-items: center;
+        }
+
+        .label {
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+        }
+
+        .val {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 8px var(--accent-color);
+        }
+
+        .footer-stats {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            border-top: 1px solid color-mix(in srgb, var(--accent-color) 20%, transparent);
+            padding-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -59,31 +127,59 @@
             <span class="label">Wave Progress</span>
             <span class="val" id="wave-text">0 / 0</span>
         </div>
-        <div class="bar-bg"><div id="wave-bar" class="bar-fill"></div></div>
+        <div class="bar-bg">
+            <div id="wave-bar" class="bar-fill"></div>
+        </div>
     </div>
 
-    <div class="row" style="margin-top: 12px;"><span class="label">NG+ Level</span><span class="val" id="ng-cycle">-</span></div>
-    <div class="row"><span class="label">Attempt</span><span class="val" id="ng-attempt">-</span></div>
-    <div class="row"><span class="label">!passive</span><span class="val" id="passive">-</span></div>
-    <div class="row"><span class="label">!hire</span><span class="val" id="hire">-</span></div>
+    <div class="row" style="margin-top: 12px;">
+        <span class="label">NG+ Level</span>
+        <span class="val" id="ng-cycle">-</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Attempt</span>
+        <span class="val" id="ng-attempt">-</span>
+    </div>
+
+    <div class="row">
+        <span class="label">!passive</span>
+        <span class="val" id="passive">-</span>
+    </div>
+
+    <div class="row">
+        <span class="label">!hire</span>
+        <span class="val" id="hire">-</span>
+    </div>
 
     <div class="footer-stats">
-        <div><span class="label">Party</span><div class="val"><span id="players">0</span> Units</div></div>
-        <div style="text-align: right;"><span class="label">Progress</span><div class="val" id="comp">0%</div></div>
+        <div>
+            <span class="label">Party</span>
+            <div class="val"><span id="players">0</span> Units</div>
+        </div>
+        <div style="text-align: right;">
+            <span class="label">Progress</span>
+            <div class="val" id="comp">0%</div>
+        </div>
     </div>
 </div>
 
 <script>
-    // Theme logic
-    const params = new URLSearchParams(window.location.search);
-    if(params.has('bg')) document.documentElement.style.setProperty('--bg-color', '#' + params.get('bg'));
-    if(params.has('accent')) document.documentElement.style.setProperty('--accent-color', '#' + params.get('accent'));
+    // Theme logic: Grabs ?bg=XXXXXX&accent=XXXXXX from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.has('bg')) {
+        document.documentElement.style.setProperty('--bg-color', '#' + urlParams.get('bg'));
+    }
+    if(urlParams.has('accent')) {
+        document.documentElement.style.setProperty('--accent-color', '#' + urlParams.get('accent'));
+    }
 
     async function updateHUD() {
         try {
             const res = await fetch(`game_stats.json?t=${Date.now()}`);
             const data = await res.json();
 
+            // Core Info
             document.getElementById('target').innerText = data.game_info.current_boss.toUpperCase();
             document.getElementById('time').innerText = data.battle_info.battle_time;
             document.getElementById('wave-text').innerText = `${data.wave_info.current_wave} / ${data.wave_info.max_waves}`;
@@ -92,12 +188,23 @@
             document.getElementById('hire').innerText = data.run_info.hire_system.current_hire || "None";
             document.getElementById('players').innerText = data.game_info.players_in_run;
             document.getElementById('comp').innerText = data.progression.completion_rate + '%';
-            document.getElementById('ng-cycle').innerText = "Level " + (data.game_info.cycle ?? "-");
-            document.getElementById('ng-attempt').innerText = "#" + (data.game_info.ng_plus_attempt ?? "-");
-        } catch (e) {}
+
+            // NG+ Level and Attempt - Using Raw Cycle/Attempt variables
+            const cycleVal = data.game_info.cycle;
+            const attemptVal = data.game_info.ng_plus_attempt;
+            
+            document.getElementById('ng-cycle').innerText = "Level " + (cycleVal !== undefined ? cycleVal : "-");
+            document.getElementById('ng-attempt').innerText = "#" + (attemptVal !== undefined ? attemptVal : "-");
+
+        } catch (e) {
+            console.error("HUD Error:", e);
+        }
     }
+
     setInterval(updateHUD, 2000);
     updateHUD();
 </script>
-</bod y>
+
+</body>
 </html>
+ 
