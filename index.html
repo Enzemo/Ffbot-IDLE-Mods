@@ -44,6 +44,46 @@
 </div>
 
 
+        <div class="source-box">
+    <h2>Session HUD Customizer</h2>
+    <p>Adjust colors then copy the URL into OBS</p>
+    
+    <div style="margin: 15px 0; display: flex; gap: 20px; align-items: center;">
+        <label>Background: <input type="color" id="bgColor" value="#0f172a"></label>
+        <label>Accent Color: <input type="color" id="accentColor" value="#38bdf8"></label>
+    </div>
+
+    <div style="background: #222; padding: 10px; border-radius: 4px; word-break: break-all; margin-bottom: 10px;">
+        <code id="generatedUrl" style="font-size: 0.8rem; color: #4ade80;">Loading...</code>
+    </div>
+
+    <button onclick="copyUrl()" class="btn">Copy OBS URL</button>
+</div>
+
+<script>
+    const bgInput = document.getElementById('bgColor');
+    const accentInput = document.getElementById('accentColor');
+    const urlDisplay = document.getElementById('generatedUrl');
+
+    function updateUrl() {
+        const bg = bgInput.value.replace('#', '');
+        const accent = accentInput.value.replace('#', '');
+        const baseUrl = window.location.href.replace('index.html', '') + 'session-hud-browser.html';
+        urlDisplay.innerText = `${baseUrl}?bg=${bg}&accent=${accent}`;
+    }
+
+    function copyUrl() {
+        navigator.clipboard.writeText(urlDisplay.innerText);
+        alert("URL Copied! Paste this into your OBS Browser Source.");
+    }
+
+    bgInput.addEventListener('input', updateUrl);
+    accentInput.addEventListener('input', updateUrl);
+    window.onload = updateUrl;
+</script>
+
+
+
         <div class="instructions">
             <h3>Installation Instructions</h3>
             <ol>
