@@ -11,13 +11,6 @@
 	# --- THIS IS THE CALL TO THE JSON WRITER ---
 	#update_game_stats()
 	#
-	#metuba_check()##  	# Update UI elements immediately
-	#update_battle_ui()
-	#
-	# --- THIS IS THE CALL TO THE JSON WRITER ---
-	#update_game_stats()
-	# -------------------------------------------
-	#
 	#metuba_check()
 
 ## if you cannot find this, open an issue or download the latest release
