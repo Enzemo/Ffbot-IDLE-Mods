@@ -2,75 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OBS - Player Profile</title>
+    <title>OBS - Advanced Player Profile</title>
     <style>
-        body { background: rgba(0,0,0,0); color: #f1f5f9; font-family: sans-serif; margin: 0; padding: 10px; text-shadow: 2px 2px 2px #000; width: 350px; }
-        .panel { background: rgba(30, 41, 59, 0.85); border-left: 4px solid #3b82f6; border-radius: 4px; padding: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
-        .title { font-weight: bold; color: #3b82f6; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 8px; font-size: 0.9rem; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem; }
-        .label { color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; }
-        .val { font-weight: bold; }
-        .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: #000; border: 1px solid #4ade80; color: #4ade80; margin-right: 4px; }
-        .locked { border-color: #f87171; color: #f87171; }
+        body { background: rgba(0,0,0,0); color: #f1f5f9; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; text-shadow: 2px 2px 2px #000; width: 380px; }
+        .panel { background: rgba(30, 41, 59, 0.9); border-left: 4px solid #3b82f6; border-radius: 4px; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .title { font-weight: bold; color: #3b82f6; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px; font-size: 0.85rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.75rem; margin-bottom: 4px; }
+        .label { color: #94a3b8; text-transform: uppercase; font-size: 0.65rem; display: block; }
+        .val { font-weight: bold; color: #fff; font-family: monospace; }
+        .roadmap-item { display: flex; justify-content: space-between; font-size: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 2px 0; }
     </style>
 </head>
 <body>
     <div class="panel">
-        <div class="title" id="name">PLAYER PROFILE</div>
+        <div class="title" id="p-name">PLAYER PROFILE</div>
         <div class="grid">
-            <div><span class="label">Unit</span><br><span id="unit" class="val">-</span></div>
-            <div><span class="label">Level</span><br><span id="lvl" class="val">-</span></div>
-            <div><span class="label">Wins</span><br><span id="wins" class="val">-</span></div>
-            <div><span class="label">Spirit</span><br><span id="spr" class="val">-</span></div>
+            <div><span class="label">Unit</span><span id="unit" class="val">-</span></div>
+            <div><span class="label">Level</span><span id="lvl" class="val">-</span></div>
+            <div><span class="label">Wins</span><span id="wins" class="val">-</span></div>
+        </div>
+        <div class="grid">
+            <div><span class="label">HP</span><span id="hp" class="val">-</span></div>
+            <div><span class="label">Attack</span><span id="atk" class="val">-</span></div>
+            <div><span class="label">Magic</span><span id="mag" class="val">-</span></div>
+            <div><span class="label">Spirit</span><span id="spr" class="val">-</span></div>
+            <div><span class="label">Preferred</span><span id="pref" class="val">-</span></div>
         </div>
     </div>
 
     <div class="panel" style="border-left-color: #a855f7;">
-        <div class="title" style="color: #a855f7;">SYSTEM STATUS</div>
-        <div id="systems" style="margin-bottom: 8px;"></div>
-        <div class="label">Collection</div>
-        <div class="val" id="col">-</div>
+        <div class="title" style="color: #a855f7;">GROWTH & COLLECTION</div>
+        <div class="grid" style="grid-template-columns: 1fr 1fr;">
+            <div><span class="label">Awakening (Lvl/Exp)</span><span class="val"><span id="awake-l">0</span> / <span id="awake-e">0</span></span></div>
+            <div><span class="label">Ascension (Lvl/Bonus)</span><span class="val"><span id="asc-l">0</span> / <span id="asc-b">0</span></span></div>
+        </div>
+        <div class="grid" style="grid-template-columns: 1fr 1fr;">
+            <div><span class="label">Items Collected</span><span id="col" class="val">-</span></div>
+            <div><span class="label">Free Hires Available</span><span id="free-hire" class="val">-</span></div>
+        </div>
+        <div><span class="label">Wins until next free hire</span><span id="next-hire" class="val">-</span></div>
     </div>
 
     <div class="panel" style="border-left-color: #10b981;">
-        <div class="title" style="color: #10b981;">PASSIVE UNLOCKS</div>
-        <div id="roadmap" style="font-size: 0.75rem;"></div>
+        <div class="title" style="color: #10b981;">PASSIVE ROADMAP</div>
+        <div id="roadmap"></div>
     </div>
 
     <script>
         async function update() {
             try {
-                // Ensure file is named player_stats.json
                 const res = await fetch(`player_stats.json?t=${Date.now()}`);
                 const p = await res.json();
                 
-                document.getElementById('name').innerText = p.player_name.toUpperCase();
+                // Basic Stats
+                document.getElementById('p-name').innerText = p.player_name.toUpperCase();
                 document.getElementById('unit').innerText = p.character_info.unit;
                 document.getElementById('lvl').innerText = p.basic_stats.level;
                 document.getElementById('wins').innerText = p.basic_stats.wins;
+                document.getElementById('hp').innerText = p.basic_stats.hp;
+                document.getElementById('atk').innerText = p.basic_stats.attack;
+                document.getElementById('mag').innerText = p.basic_stats.magic;
                 document.getElementById('spr').innerText = p.basic_stats.spirit;
+                document.getElementById('pref').innerText = p.basic_stats.preferred_stat;
+
+                // Character Info
+                document.getElementById('awake-l').innerText = p.character_info.awakening_level_specific;
+                document.getElementById('awake-e').innerText = p.character_info.awakening_exp;
+                document.getElementById('asc-l').innerText = p.character_info.ascension_level;
+                document.getElementById('asc-b').innerText = p.character_info.ascension_exp_bonus;
+
+                // Collection & Hires
                 document.getElementById('col').innerText = `${p.collection.collected} / ${p.collection.total} (${p.collection.percentage}%)`;
+                document.getElementById('free-hire').innerText = p.free_hire.current_count;
+                document.getElementById('next-hire').innerText = p.free_hire.wins_until_available;
 
-                const sys = [
-                    {n: 'Art', a: p.artifacts.system_active}, 
-                    {n: 'Card', a: p.cards.system_active},
-                    {n: 'Esp', a: p.espers.system_active}, 
-                    {n: 'Pas', a: p.passives.system_active}
-                ];
-                document.getElementById('systems').innerHTML = sys.map(s => `<span class="badge ${s.a?'':'locked'}">${s.n}</span>`).join('');
-
+                // Passives
                 document.getElementById('roadmap').innerHTML = p.passives.available_passives.map(i => `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                        <span>Slot ${i.slot}</span>
-                        <span style="color:${i.unlocked?'#4ade80':'#94a3b8'}">${i.unlocked?'READY':i.wins_until_unlock+' to go'}</span>
+                    <div class="roadmap-item">
+                        <span>Slot ${i.slot}: <strong>${i.name}</strong></span>
+                        <span style="color:${i.unlocked?'#4ade80':'#94a3b8'}">
+                            ${i.unlocked ? 'UNLOCKED' : `Req: ${i.wins_required} (${i.wins_until_unlock} left)`}
+                        </span>
                     </div>
                 `).join('');
-            } catch (e) {
-                console.error("Error loading player_stats.json:", e);
-            }
+            } catch (e) { console.error(e); }
         }
-        setInterval(update, 5000); 
-        update();
+        setInterval(update, 5000); update();
     </script>
 </body>
 </html>
