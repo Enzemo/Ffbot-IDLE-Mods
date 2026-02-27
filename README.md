@@ -12,3 +12,6 @@ An example html can be found here, this is simply an example of how the Jsons ca
 Wouldn't have been possible without this tool: https://dmitriysalnikov.itch.io/godot-pck-explorer
 
 Link to Elbody's ff bot idle game: https://elbody.itch.io/ffbot
+
+
+I will attempt to keep this updated along with game updates, although I can't make any promises. Currently supports only version 9.01, the current latest (at time of writing). 
