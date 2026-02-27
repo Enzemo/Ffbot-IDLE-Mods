@@ -3,240 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enzemo // Game Dashboard</title>
+    <title>Enzemo // Game Command</title>
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #38bdf8;
-            --text-main: #f1f5f9;
-            --text-dim: #94a3b8;
-            --danger: #ef4444;
-            --success: #22c55e;
+            --bg: #0d1117; --card: #161b22; --border: #30363d;
+            --accent: #58a6ff; --text: #c9d1d9; --muted: #8b949e;
+            --success: #3fb950; --warning: #d29922; --danger: #f85149;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            width: 95%;
-            max-width: 1200px;
-            padding: 40px 0;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 16px;
-            height: fit-content;
-            border-left: 4px solid var(--accent);
-        }
-
-        .profile-header h1 { margin: 0; font-size: 1.5rem; color: var(--accent); }
-        .profile-header p { margin: 5px 0 20px 0; color: var(--text-dim); font-size: 0.9rem; }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-box {
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-box label { display: block; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; }
-        .stat-box span { font-weight: bold; font-size: 1.1rem; }
-
-        /* Main Content Styling */
-        .main-content { display: flex; flex-direction: column; gap: 20px; }
-
-        .card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
-        }
-
-        .run-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .boss-tag {
-            background: var(--danger);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .progress-container { margin: 20px 0; }
-        .progress-bar {
-            height: 12px;
-            background: #334155;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #818cf8);
-            width: 0%;
-            transition: width 1s ease-in-out;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-        }
-
-        .badge {
-            background: rgba(56, 189, 248, 0.1);
-            color: var(--accent);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 850px) {
-            .dashboard { grid-template-columns: 1fr; }
-        }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .dashboard { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1300px; margin: 0 auto; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        h2 { font-size: 1.1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 0; }
+        h3 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin: 15px 0 10px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; }
+        .label { display: block; font-size: 0.7rem; color: var(--muted); }
+        .val { font-weight: bold; font-family: monospace; }
+        .bar { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+        .fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s; }
+        .passive-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #21262d; }
+        .badge { padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; background: #21262d; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; color: var(--muted); padding: 8px; border-bottom: 1px solid var(--border); }
+        td { padding: 8px; border-bottom: 1px solid #21262d; }
     </style>
 </head>
 <body>
 
 <div class="dashboard">
-    <aside class="sidebar">
-        <div class="profile-header">
-            <h1 id="pName">---</h1>
-            <p id="pUnit">Unit: ---</p>
-        </div>
-
-        <div class="stat-grid">
-            <div class="stat-box"><label>Level</label><span id="sLevel">-</span></div>
-            <div class="stat-box"><label>HP</label><span id="sHp">-</span></div>
-            <div class="stat-box"><label>ATK</label><span id="sAtk">-</span></div>
-            <div class="stat-box"><label>MAG</label><span id="sMag">-</span></div>
-        </div>
-
-        <h3 style="font-size: 0.9rem; color: var(--text-dim);">Collection Progress</h3>
-        <div class="progress-bar" style="height: 6px;">
-            <div id="colProgress" class="progress-fill"></div>
-        </div>
-        <p id="colText" style="font-size: 0.8rem; margin-top: 5px;">0/0 Collected</p>
+    <aside>
+        <section class="card">
+            <h2 id="p-name">Loading...</h2>
+            <div class="stat-grid">
+                <div class="stat-box"><span class="label">Unit</span><span id="p-unit" class="val">-</span></div>
+                <div class="stat-box"><span class="label">Level</span><span id="p-lvl" class="val">-</span></div>
+            </div>
+            <h3>Core Stats</h3>
+            <div class="stat-grid">
+                <div class="stat-box"><span class="label">HP</span><span id="p-hp" class="val">-</span></div>
+                <div class="stat-box"><span class="label">ATK</span><span id="p-atk" class="val">-</span></div>
+                <div class="stat-box"><span class="label">MAG</span><span id="p-mag" class="val">-</span></div>
+                <div class="stat-box"><span class="label">SPR</span><span id="p-spr" class="val">-</span></div>
+            </div>
+            <h3>Collection</h3>
+            <div class="bar"><div id="col-fill" class="fill"></div></div>
+            <div style="font-size: 0.75rem; text-align: right;" id="col-text">0 / 0</div>
+        </section>
     </aside>
 
-    <main class="main-content">
+    <main>
         <section class="card">
-            <div class="run-header">
-                <div>
-                    <h2 style="margin:0">Current Run: Stage <span id="gStage">-</span></h2>
-                    <span class="badge">Tier <span id="gTier">-</span></span>
-                </div>
-                <div class="boss-tag">BOSS: <span id="gBoss">-</span></div>
+            <h2>Live Battle: vs <span id="g-boss">-</span></h2>
+            <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stat-box"><span class="label">Stage</span><span id="g-stage" class="val">-</span></div>
+                <div class="stat-box"><span class="label">Wave</span><span id="g-wave" class="val">-</span></div>
+                <div class="stat-box"><span class="label">Time</span><span id="g-time" class="val">-</span></div>
             </div>
-
-            <div class="details-grid">
-                <div>
-                    <label style="color:var(--text-dim); font-size: 0.8rem;">Wave Progress</label>
-                    <div class="progress-container">
-                        <span id="waveText" style="font-weight: bold;">Wave - of -</span>
-                        <div class="progress-bar"><div id="waveFill" class="progress-fill"></div></div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <label style="color:var(--text-dim); font-size: 0.8rem;">Battle Time</label>
-                    <p id="gTime" style="font-size: 1.2rem; font-weight: bold; margin: 5px 0;">00:00:00</p>
-                </div>
-            </div>
+            <div class="bar" style="margin-top:20px;"><div id="wave-fill" class="fill"></div></div>
         </section>
 
         <section class="card">
-            <h3 style="margin-top: 0;">Next Unlockable Passives</h3>
-            <div id="passivesList">
-                </div>
+            <h2>Passive Unlock Milestones</h2>
+            <div id="passives-list"></div>
+        </section>
+
+        <section class="card">
+            <h2>Current Party</h2>
+            <table>
+                <thead><tr><th>Name</th><th>Unit</th><th>Current HP</th><th>ATB</th><th>Passive</th></tr></thead>
+                <tbody id="party-list"></tbody>
+            </table>
         </section>
     </main>
 </div>
 
 <script>
-    // DATA SOURCES
-    const playerStats = {
-        "basic_stats": {"attack": 9, "hp": 28, "level": 18, "magic": 9},
-        "character_info": {"unit": "Firion"},
-        "collection": {"collected": 1, "total": 129},
-        "passives": {
-            "available_passives": [
-                {"name": "Unknown", "wins_until_unlock": 98},
-                {"name": "Unknown", "wins_until_unlock": 198}
-            ]
-        },
-        "player_name": "Enzemo"
-    };
+async function loadDashboard() {
+    try {
+        const [pRes, gRes] = await Promise.all([fetch('player_stats.json'), fetch('game_stats.json')]);
+        const p = await pRes.json();
+        const g = await gRes.json();
 
-    const gameStats = {
-        "battle_info": {"battle_time": "00:01:10"},
-        "game_info": {"current_boss": "Sweeper", "stage": 2, "tier": 30},
-        "wave_info": {"current_wave": 2, "max_waves": 47, "wave_progress_percent": 4}
-    };
+        // Player Section
+        document.getElementById('p-name').textContent = p.player_name;
+        document.getElementById('p-unit').textContent = p.character_info.unit;
+        document.getElementById('p-lvl').textContent = p.basic_stats.level;
+        document.getElementById('p-hp').textContent = p.basic_stats.hp;
+        document.getElementById('p-atk').textContent = p.basic_stats.attack;
+        document.getElementById('p-mag').textContent = p.basic_stats.magic;
+        document.getElementById('p-spr').textContent = p.basic_stats.spirit;
 
-    // INJECTION LOGIC
-    function init() {
-        // Populate Sidebar
-        document.getElementById('pName').innerText = playerStats.player_name;
-        document.getElementById('pUnit').innerText = `Unit: ${playerStats.character_info.unit}`;
-        document.getElementById('sLevel').innerText = playerStats.basic_stats.level;
-        document.getElementById('sHp').innerText = playerStats.basic_stats.hp;
-        document.getElementById('sAtk').innerText = playerStats.basic_stats.attack;
-        document.getElementById('sMag').innerText = playerStats.basic_stats.magic;
-        
-        const colPerc = (playerStats.collection.collected / playerStats.collection.total) * 100;
-        document.getElementById('colProgress').style.width = colPerc + '%';
-        document.getElementById('colText').innerText = `${playerStats.collection.collected}/${playerStats.collection.total} Collected`;
+        const cPerc = (p.collection.collected / p.collection.total) * 100;
+        document.getElementById('col-fill').style.width = cPerc + '%';
+        document.getElementById('col-text').textContent = `${p.collection.collected} / ${p.collection.total} Items`;
 
-        // Populate Main Run Info
-        document.getElementById('gStage').innerText = gameStats.game_info.stage;
-        document.getElementById('gTier').innerText = gameStats.game_info.tier;
-        document.getElementById('gBoss').innerText = gameStats.game_info.current_boss;
-        document.getElementById('gTime').innerText = gameStats.battle_info.battle_time;
-        
-        document.getElementById('waveText').innerText = `Wave ${gameStats.wave_info.current_wave} of ${gameStats.wave_info.max_waves}`;
-        document.getElementById('waveFill').style.width = gameStats.wave_info.wave_progress_percent + '%';
+        // Game Section
+        document.getElementById('g-boss').textContent = g.game_info.current_boss;
+        document.getElementById('g-stage').textContent = g.game_info.stage;
+        document.getElementById('g-wave').textContent = `${g.wave_info.current_wave}/${g.wave_info.max_waves}`;
+        document.getElementById('g-time').textContent = g.battle_info.battle_time;
+        document.getElementById('wave-fill').style.width = g.wave_info.wave_progress_percent + '%';
 
-        // Populate Passives
-        const pList = document.getElementById('passivesList');
-        playerStats.passives.available_passives.forEach(p => {
-            const div = document.createElement('div');
-            div.style.padding = "10px 0";
-            div.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-            div.innerHTML = `<strong>${p.name}</strong> - <span style="color:var(--text-dim)">Unlock in ${p.wins_until_unlock} wins</span>`;
-            pList.appendChild(div);
+        // Passives Section
+        const pList = document.getElementById('passives-list');
+        p.passives.available_passives.forEach(item => {
+            const prog = (p.basic_stats.wins / item.wins_required) * 100;
+            pList.innerHTML += `
+                <div class="passive-row">
+                    <div style="flex:1">
+                        <strong>Slot ${item.slot}: ${item.name}</strong>
+                        <div class="bar" style="width: 80%; height: 4px;"><div class="fill" style="width:${prog}%"></div></div>
+                    </div>
+                    <div class="badge">${item.wins_until_unlock} wins remaining</div>
+                </div>`;
         });
+
+        // Party Section
+        const party = document.getElementById('party-list');
+        g.player_details.forEach(unit => {
+            party.innerHTML += `
+                <tr>
+                    <td><strong>${unit.name}</strong></td>
+                    <td>${unit.unit}</td>
+                    <td style="color:var(--success)">${unit.hp_current} HP</td>
+                    <td>${unit.atb}%</td>
+                    <td><span class="badge">${unit.passive || 'None'}</span></td>
+                </tr>`;
+        });
+
+    } catch (e) {
+        console.error(e);
+        document.body.innerHTML = `<div style="text-align:center; padding:50px;"><h2>Load Error</h2><p>Check that player_stats.json and game_stats.json are in this folder.</p></div>`;
     }
-
-    init();
+}
+loadDashboard();
 </script>
-
 </body>
 </html>
