@@ -3,6 +3,23 @@
 ## Obviously requires Elbody's source code
 ## Find it yourself
 
+##  insert the update_game_stats() function in func set_table(actorlist):
+## example:
+	# Update UI elements immediately
+	#update_battle_ui()
+	#
+	# --- THIS IS THE CALL TO THE JSON WRITER ---
+	#update_game_stats()
+	#
+	#metuba_check()##  	# Update UI elements immediately
+	#update_battle_ui()
+	#
+	# --- THIS IS THE CALL TO THE JSON WRITER ---
+	#update_game_stats()
+	# -------------------------------------------
+	#
+	#metuba_check()
+
 
 # Variable for the writer node
 @onready var game_stats_writer = $"../game_stats_writer"
