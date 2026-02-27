@@ -32,9 +32,9 @@ If you are manually adding these features to the game files or updating a custom
 * **Requirement**: Include a `gameover.wav` in the same folder as the game executable. You can find an example file in the project releases.
 
 ### 4. Data Export (JSON)
-Once the mod is running, it will automatically generate two JSON files in the same location as the executable:
-* **player_stats.json**: Persistent character data, core attributes (ATK, MAG, SPR), and growth metrics.
-* **game_stats.json**: Live session data, including current boss HP, wave progress, and party unit details.
+Once the mod is running, it will generate two JSON files in the same location as the executable:
+* **player_stats.json**: Persistent character data, core attributes (ATK, MAG, SPR), and growth metrics. Generated upon a user using the !stat or !stats commandm
+* **game_stats.json**: Live session data, including current boss HP, wave progress, and party unit details. Generates when the first battle begins. 
 
 ---
 
