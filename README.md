@@ -22,7 +22,7 @@ To apply the mod to your game, you must replace the default game data with the m
 * **Requirement**: Include a `gameover.wav` in the same folder as the game executable. You can find an example file in the project releases.
 
 ### 3. Data Export (JSON)
-Once the mod is running, it will automatically generate two JSON files in the same location as the executable:
+Once the mod is running and a battle has started, it will automatically generate two JSON files in the same location as the executable:
 * **player_stats.json**: Persistent character data, core attributes (ATK, MAG, SPR), and growth metrics.
 * **game_stats.json**: Live session data, including current boss HP, wave progress, and party unit details.
 
