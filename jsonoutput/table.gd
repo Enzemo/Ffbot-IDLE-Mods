@@ -3,7 +3,7 @@
 ## Obviously requires Elbody's source code
 ## Find it yourself
 
-##  insert the update_game_stats() function in func set_table(actorlist):
+##  make sure you insert the update_game_stats() function in func set_table(actorlist):
 ## example:
 	# Update UI elements immediately
 	#update_battle_ui()
