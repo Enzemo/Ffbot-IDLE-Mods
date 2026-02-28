@@ -5,8 +5,14 @@
 #Check the text file for more details.
 #
 #Make sure you add play_game_over_sound() somewhere in the func game_over(): 
-#
 #i place it after update_battle_ui() 
+#
+#
+#Make sure you add a play_ragtime_appearance_sound() after: 
+#	final_table_set()
+#	if tiertracker.ragtime_active == true:
+#		ragtime.generate_question()
+#
 
 
 
