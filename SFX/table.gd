@@ -73,3 +73,42 @@ func play_game_over_sound():
 				write_to_debug_file("SUCCESS: Playing internal asset.")
 	else:
 		write_to_debug_file("ERROR: No files found.")
+
+# Logic to play the Ragtime Mouse appearance sound
+func play_ragtime_appearance_sound():
+	var local_dir = OS.get_executable_path().get_base_dir()
+	var external_path = local_dir + "/ragtime.wav"
+	var internal_path = "res://assets/sounds/ragtime.wav"
+	
+	# 1. TRY EXTERNAL FILE
+	if FileAccess.file_exists(external_path):
+		var file = FileAccess.open(external_path, FileAccess.READ)
+		if file:
+			var bytes = file.get_buffer(file.get_length())
+			file.close()
+			
+			var new_stream = AudioStreamWAV.new()
+			new_stream.format = AudioStreamWAV.FORMAT_16_BITS 
+			new_stream.data = bytes
+			new_stream.mix_rate = 44100
+			new_stream.stereo = true
+			
+			var audio_player = AudioStreamPlayer.new()
+			get_tree().current_scene.add_child(audio_player)
+			audio_player.stream = new_stream
+			audio_player.play()
+			
+			await audio_player.finished
+			audio_player.queue_free()
+			return
+
+	# 2. FALLBACK TO INTERNAL
+	if ResourceLoader.exists(internal_path):
+		var internal_res = load(internal_path)
+		if internal_res:
+			var audio_player = AudioStreamPlayer.new()
+			get_tree().current_scene.add_child(audio_player)
+			audio_player.stream = internal_res
+			audio_player.play()
+			await audio_player.finished
+			audio_player.queue_free()
