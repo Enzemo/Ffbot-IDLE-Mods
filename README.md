@@ -30,6 +30,8 @@ If you are manually adding these features to the game files or updating a custom
 ### 3. Audio Alerts
 * **Game Over SFX**: Plays a sound when hitting a game over. 
 * **Requirement**: Include a `gameover.wav` in the same folder as the game executable. You can find an example file in the project releases.
+* * **Ragtime Mouse SFX**: Plays a sound when encounting Ragtime Mouse/Trivia. 
+* **Requirement**: Include a `ragtime.wav` in the same folder as the game executable.
 
 ### 4. Data Export (JSON)
 Once the mod is running, it will generate two JSON files in the same location as the executable:
