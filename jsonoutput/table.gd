@@ -43,3 +43,9 @@ func update_game_stats():
 		print("DEBUG: Successfully called update_all_game_stats with JSON data")
 	else:
 		print("DEBUG: game_stats_writer not found!")
+
+# Add to table.gd
+
+func update_ascend_json(player_name: String, stats: Dictionary, ascension: float):
+	if game_stats_writer:
+		game_stats_writer.write_ascend_data_json(player_name, stats, ascension)
