@@ -46,6 +46,6 @@ func update_game_stats():
 
 # Add to table.gd
 
-func update_ascend_json(player_name: String, stats: Dictionary, ascension: float):
+func update_ascend_output(p_name: String, a: int, m: int, s: int, h: int, asc: float):
 	if game_stats_writer:
-		game_stats_writer.write_ascend_data_json(player_name, stats, ascension)
+		game_stats_writer.write_ascend_data_json(p_name, a, m, s, h, asc)
