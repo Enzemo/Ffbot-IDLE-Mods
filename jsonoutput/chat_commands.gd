@@ -59,4 +59,23 @@
 			fallback_writer = get_node_or_null("%game_stats_writer")
 			if fallback_writer:
 				fallback_writer.write_ascend_stats_json(name, playerdatabase, table, tiertracker, new_stats_dict)
-	
+
+
+
+#
+#
+#put in func freehire_set(nmame):
+
+# Output JSON file with freehire and playername
+		if game_stats_writer:
+			game_stats_writer.write_freehire_json(name, freehire)
+		else:
+			# Fallback: try to find the node dynamically
+			var fallback_writer = get_node_or_null("../game_stats_writer")
+			if fallback_writer:
+				fallback_writer.write_freehire_json(name, freehire)
+			else:
+				# Try another common path
+				fallback_writer = get_node_or_null("%game_stats_writer")
+				if fallback_writer:
+					fallback_writer.write_freehire_json(name, freehire)
