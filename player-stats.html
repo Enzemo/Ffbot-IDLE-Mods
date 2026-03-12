@@ -69,13 +69,19 @@
         #ascend-toast { border: 2px solid var(--toast-blue); }
         #freehire-toast { border: 2px solid var(--status-green); }
 
-        /* Missing Characters Two Column Scroll */
-        #missing-toast { border: 2px solid var(--accent-color); justify-content: flex-start; padding-top: 15px; overflow: hidden; }
-        .missing-title { color: var(--accent-color); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 10px; }
+        /* Missing Characters Style Updates */
+        #missing-toast { border: 2px solid var(--accent-color); justify-content: flex-start; padding-top: 12px; overflow: hidden; }
+        .missing-header { display: flex; justify-content: space-between; align-items: baseline; width: 100%; margin-bottom: 8px; padding: 0 4px; }
+        .missing-title { color: var(--accent-color); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin: 0; }
+        .missing-count-text { color: var(--text-dim); font-size: 0.7rem; font-weight: bold; }
         
         .scroll-container { 
-            width: 100%; height: 160px; overflow: hidden; position: relative; 
-            background: rgba(255, 255, 255, 0.05); border-radius: 4px; 
+            width: 100%; 
+            height: 240px; /* Lengthened: Shows 6 rows instead of 4 */
+            overflow: hidden; 
+            position: relative; 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 4px; 
         }
         .scroll-content {
             display: grid;
@@ -84,7 +90,6 @@
             position: relative;
             transform: translateY(0);
         }
-        /* The class we will add via JS after 2 seconds */
         .scrolling-active {
             animation: scrollVertical linear forwards;
         }
@@ -159,9 +164,13 @@
     </div>
 
     <div id="missing-toast" class="toast-base">
-        <div class="missing-title">Missing Characters</div>
-        <div class="scroll-container"><div id="missing-scroll-list" class="scroll-content"></div></div>
-        <div style="margin-top: 10px; color: var(--text-dim); font-size: 0.7rem; padding-bottom: 5px;">Total Missing: <span id="missing-count">0</span></div>
+        <div class="missing-header">
+            <h2 class="missing-title">Missing Characters</h2>
+            <span class="missing-count-text">Total: <span id="missing-count">0</span></span>
+        </div>
+        <div class="scroll-container">
+            <div id="missing-scroll-list" class="scroll-content"></div>
+        </div>
     </div>
 </div>
 
@@ -193,19 +202,12 @@
         isToastShowing = true;
         const currentItem = toastQueue.shift();
         const element = document.getElementById(currentItem.id);
-        
         element.classList.add('active');
 
-        // Handle Missing Character scroll trigger with 2s manual delay
         if(currentItem.id === 'missing-toast') {
             const scrollList = document.getElementById('missing-scroll-list');
             scrollList.classList.remove('scrolling-active');
-            
-            setTimeout(() => {
-                if (element.classList.contains('active')) {
-                    scrollList.classList.add('scrolling-active');
-                }
-            }, 2000); // The 2-second pause
+            setTimeout(() => { if (element.classList.contains('active')) scrollList.classList.add('scrolling-active'); }, 2000);
         }
 
         setTimeout(() => {
@@ -219,31 +221,24 @@
             const char = data.character_info || {}, basic = data.basic_stats || {}, passives = data.passives || {}, fh = data.free_hire || {}, coll = data.collection || {};
             document.getElementById('p-name').innerText = data.player_name || "PLAYER";
             document.getElementById('p-unit').innerText = char.unit || "UNIT";
-            
             if (csvMapping.length > 0) {
                 const match = csvMapping.find(m => m.id === char.unit);
                 const imgEl = document.getElementById('unit-icon');
                 if (match) { imgEl.src = `units/${match.file}.png`; imgEl.style.visibility = 'visible'; }
             }
-            
             currentWins = basic.wins ?? 0;
             document.getElementById('p-wins').innerText = currentWins;
             document.getElementById('p-level').innerText = formatStat(basic.level);
             document.getElementById('p-collection').innerText = `${coll.collected ?? 0}/${coll.total ?? 0} (${coll.percentage ?? 0}%)`;
             document.getElementById('status-freehire').style.color = fh.available ? "var(--status-green)" : "var(--status-red)";
             document.getElementById('status-ascension').style.color = currentWins >= 100 ? "var(--status-green)" : "var(--status-red)";
-
             let pref = (basic.preferred_stat || "").toLowerCase();
             ['hp', 'attack', 'magic', 'spirit'].forEach(k => {
-                const valEl = document.getElementById('p-' + k), labelEl = document.getElementById('l-' + k);
+                const valEl = document.getElementById('p-' + k), lbl = document.getElementById('l-' + k);
                 valEl.innerText = formatStat(basic[k]);
-                if(k === (pref === "atk" ? "attack" : (pref === "mag" ? "magic" : (pref === "spi" ? "spirit" : pref)))) {
-                    valEl.classList.add('highlight-val'); labelEl.classList.add('highlight-text');
-                } else {
-                    valEl.classList.remove('highlight-val'); labelEl.classList.remove('highlight-text');
-                }
+                if(k === (pref === "atk"?"attack":(pref==="mag"?"magic":(pref==="spi"?"spirit":pref)))) { valEl.classList.add('highlight-val'); lbl.classList.add('highlight-text'); }
+                else { valEl.classList.remove('highlight-val'); lbl.classList.remove('highlight-text'); }
             });
-
             document.getElementById('p-selected').innerText = passives.season5_passive || "None";
             const container = document.getElementById('p-available-container');
             container.innerHTML = "";
@@ -276,8 +271,7 @@
                     document.getElementById('fh-pname').innerText = data.player_name;
                     document.getElementById('fh-unit').innerText = data.freehire_character;
                     const match = csvMapping.find(m => m.id === data.freehire_character);
-                    const icon = document.getElementById('fh-unit-icon');
-                    if (match) { icon.src = `units/${match.file}.png`; icon.style.display = 'block'; }
+                    if (match) { document.getElementById('fh-unit-icon').src = `units/${match.file}.png`; document.getElementById('fh-unit-icon').style.display = 'block'; }
                     toastQueue.push({ id: 'freehire-toast', duration: 8000 });
                     processQueue();
                 }
@@ -303,13 +297,13 @@
                 });
                 
                 const rowCount = Math.ceil(list.length / 2);
-                const scrollDist = Math.max(0, (rowCount - 4) * 40);
+                const visibleRows = 6; // Matching container height (240px / 40px)
+                const scrollDist = Math.max(0, (rowCount - visibleRows) * 40);
                 scrollList.style.setProperty('--scroll-dist', `-${scrollDist}px`);
                 
-                const scrollDuration = Math.max(1, (rowCount - 4) * 1.5);
+                const scrollDuration = Math.max(1, (rowCount - visibleRows) * 1.5);
                 scrollList.style.animationDuration = `${scrollDuration}s`;
                 
-                // Total duration = 2s start pause + scroll time + 2s end pause
                 toastQueue.push({ id: 'missing-toast', duration: (2 + scrollDuration + 2) * 1000 });
                 processQueue();
             }
