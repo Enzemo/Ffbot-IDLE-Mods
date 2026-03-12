@@ -66,10 +66,11 @@
         }
         .toast-base.active { opacity: 1; pointer-events: auto; }
         
+        /* Priority items appear over others */
+        #ascend-toast, #freehire-toast { z-index: 200; }
         #ascend-toast { border: 2px solid var(--toast-blue); }
         #freehire-toast { border: 2px solid var(--status-green); }
 
-        /* Missing Characters Style Updates */
         #missing-toast { border: 2px solid var(--accent-color); justify-content: flex-start; padding-top: 12px; overflow: hidden; }
         .missing-header { display: flex; justify-content: space-between; align-items: baseline; width: 100%; margin-bottom: 8px; padding: 0 4px; }
         .missing-title { color: var(--accent-color); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin: 0; }
@@ -77,7 +78,7 @@
         
         .scroll-container { 
             width: 100%; 
-            height: 240px; /* Lengthened: Shows 6 rows instead of 4 */
+            height: 240px; 
             overflow: hidden; 
             position: relative; 
             background: rgba(255, 255, 255, 0.05); 
@@ -90,9 +91,9 @@
             position: relative;
             transform: translateY(0);
         }
-        .scrolling-active {
-            animation: scrollVertical linear forwards;
-        }
+        .scrolling-active { animation: scrollVertical linear forwards; }
+        .paused-scroll { animation-play-state: paused !important; }
+        
         .scroll-item { 
             height: 40px; display: flex; align-items: center; padding: 0 5px; gap: 5px; 
             font-weight: bold; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.03); 
@@ -100,13 +101,14 @@
         }
         .mini-icon { width: 24px; height: 24px; object-fit: contain; flex-shrink: 0; }
 
-        @keyframes scrollVertical { 
-            0% { transform: translateY(0); } 
-            100% { transform: translateY(var(--scroll-dist)); } 
-        }
+        /* Confetti & Success */
+        .confetti-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; overflow: hidden; pointer-events: none; }
+        .confetti { position: absolute; width: 8px; height: 8px; top: -10px; animation: confettiFall 3s linear forwards; }
+        @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(300px) rotate(720deg); opacity: 0; } }
+        .success-msg { color: var(--status-green); font-size: 1.4rem; font-weight: 900; text-transform: uppercase; text-align: center; animation: winPulse 0.8s ease-in-out infinite; }
 
-        @keyframes winPulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); color: var(--status-green); } 100% { transform: scale(1); } }
-        .pulse { display: inline-block; animation: winPulse 0.8s ease-in-out 12; }
+        @keyframes scrollVertical { 0% { transform: translateY(0); } 100% { transform: translateY(var(--scroll-dist)); } }
+        @keyframes winPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); color: var(--status-green); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -164,19 +166,30 @@
     </div>
 
     <div id="missing-toast" class="toast-base">
-        <div class="missing-header">
-            <h2 class="missing-title">Missing Characters</h2>
-            <span class="missing-count-text">Total: <span id="missing-count">0</span></span>
+        <div id="confetti-holder" class="confetti-container"></div>
+        <div id="missing-content-wrapper" style="width:100%;">
+            <div class="missing-header">
+                <h2 class="missing-title">Missing Characters</h2>
+                <span class="missing-count-text">Total: <span id="missing-count">0</span></span>
+            </div>
+            <div class="scroll-container"><div id="missing-scroll-list" class="scroll-content"></div></div>
         </div>
-        <div class="scroll-container">
-            <div id="missing-scroll-list" class="scroll-content"></div>
+        <div id="missing-success-wrapper" style="display:none; flex-direction:column; align-items:center;">
+            <div id="success-player" style="font-weight:800; font-size:1.1rem; margin-bottom:10px; text-transform:uppercase;">-</div>
+            <div class="success-msg">All units hired!</div>
         </div>
     </div>
 </div>
 
 <script>
     let lastAscendContent = null, lastFreehireContent = null, lastMissingContent = null;
-    let currentWins = 0, csvMapping = [], toastQueue = [], isToastShowing = false;
+    let csvMapping = [], toastQueue = [], isToastShowing = false;
+    
+    // Priority tracking
+    let isPriorityActive = false;
+    let missingTimer = null;
+    let missingStartTime = 0;
+    let missingRemainingTime = 0;
 
     function loadCSV() {
         fetch("FFBot.csv?t=" + Date.now()).then(r => r.text()).then(text => {
@@ -197,41 +210,115 @@
         return num;
     }
 
+    function spawnConfetti() {
+        const holder = document.getElementById('confetti-holder');
+        holder.innerHTML = '';
+        const colors = ['#e9ac2e', '#22c55e', '#3b82f6', '#ef4444', '#f1f5f9'];
+        for (let i = 0; i < 60; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + '%';
+            c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDelay = Math.random() * 2 + 's';
+            c.style.width = c.style.height = (Math.random() * 6 + 4) + 'px';
+            holder.appendChild(c);
+        }
+    }
+
     function processQueue() {
         if (isToastShowing || toastQueue.length === 0) return;
         isToastShowing = true;
-        const currentItem = toastQueue.shift();
-        const element = document.getElementById(currentItem.id);
-        element.classList.add('active');
-
-        if(currentItem.id === 'missing-toast') {
+        
+        const item = toastQueue.shift();
+        const element = document.getElementById(item.id);
+        
+        if(item.id === 'missing-toast') {
+            const content = document.getElementById('missing-content-wrapper');
+            const success = document.getElementById('missing-success-wrapper');
             const scrollList = document.getElementById('missing-scroll-list');
-            scrollList.classList.remove('scrolling-active');
-            setTimeout(() => { if (element.classList.contains('active')) scrollList.classList.add('scrolling-active'); }, 2000);
+            
+            if (item.isSuccess) {
+                content.style.display = 'none';
+                success.style.display = 'flex';
+                spawnConfetti();
+            } else {
+                content.style.display = 'block';
+                success.style.display = 'none';
+                scrollList.classList.remove('scrolling-active');
+                setTimeout(() => { if (element.classList.contains('active')) scrollList.classList.add('scrolling-active'); }, 2000);
+            }
+            
+            missingStartTime = Date.now();
+            missingRemainingTime = item.duration;
+            element.classList.add('active');
+            
+            missingTimer = setTimeout(() => {
+                element.classList.remove('active');
+                setTimeout(() => { isToastShowing = false; processQueue(); }, 400);
+            }, missingRemainingTime);
+            
+        } else {
+            element.classList.add('active');
+            setTimeout(() => {
+                element.classList.remove('active');
+                setTimeout(() => { isToastShowing = false; processQueue(); }, 400);
+            }, item.duration);
         }
+    }
 
+    // Handles Ascension and Freehire Overlays
+    function showPriorityToast(id, duration) {
+        const el = document.getElementById(id);
+        const missingEl = document.getElementById('missing-toast');
+        const scrollList = document.getElementById('missing-scroll-list');
+        
+        isPriorityActive = true;
+        
+        // Pause background missing list if visible
+        if (missingEl.classList.contains('active')) {
+            scrollList.classList.add('paused-scroll');
+            clearTimeout(missingTimer);
+            missingRemainingTime -= (Date.now() - missingStartTime);
+        }
+        
+        el.classList.add('active');
+        
         setTimeout(() => {
-            element.classList.remove('active');
-            setTimeout(() => { isToastShowing = false; processQueue(); }, 400);
-        }, currentItem.duration);
+            el.classList.remove('active');
+            isPriorityActive = false;
+            
+            // Resume background missing list
+            if (missingEl.classList.contains('active')) {
+                scrollList.classList.remove('paused-scroll');
+                missingStartTime = Date.now();
+                missingTimer = setTimeout(() => {
+                    missingEl.classList.remove('active');
+                    setTimeout(() => { isToastShowing = false; processQueue(); }, 400);
+                }, missingRemainingTime);
+            }
+        }, duration);
     }
 
     function updatePlayer() {
         fetch("player_stats.json?t=" + Date.now()).then(r => r.json()).then(data => {
             const char = data.character_info || {}, basic = data.basic_stats || {}, passives = data.passives || {}, fh = data.free_hire || {}, coll = data.collection || {};
             document.getElementById('p-name').innerText = data.player_name || "PLAYER";
-            document.getElementById('p-unit').innerText = char.unit || "UNIT";
+            
+            // Unit name override removed - displays data as-is
+            const unitName = char.unit || "UNIT";
+            document.getElementById('p-unit').innerText = unitName;
+
             if (csvMapping.length > 0) {
-                const match = csvMapping.find(m => m.id === char.unit);
+                const match = csvMapping.find(m => m.id === unitName);
                 const imgEl = document.getElementById('unit-icon');
                 if (match) { imgEl.src = `units/${match.file}.png`; imgEl.style.visibility = 'visible'; }
             }
-            currentWins = basic.wins ?? 0;
-            document.getElementById('p-wins').innerText = currentWins;
+            document.getElementById('p-wins').innerText = basic.wins ?? 0;
             document.getElementById('p-level').innerText = formatStat(basic.level);
             document.getElementById('p-collection').innerText = `${coll.collected ?? 0}/${coll.total ?? 0} (${coll.percentage ?? 0}%)`;
             document.getElementById('status-freehire').style.color = fh.available ? "var(--status-green)" : "var(--status-red)";
-            document.getElementById('status-ascension').style.color = currentWins >= 100 ? "var(--status-green)" : "var(--status-red)";
+            document.getElementById('status-ascension').style.color = (basic.wins ?? 0) >= 100 ? "var(--status-green)" : "var(--status-red)";
+            
             let pref = (basic.preferred_stat || "").toLowerCase();
             ['hp', 'attack', 'magic', 'spirit'].forEach(k => {
                 const valEl = document.getElementById('p-' + k), lbl = document.getElementById('l-' + k);
@@ -239,12 +326,16 @@
                 if(k === (pref === "atk"?"attack":(pref==="mag"?"magic":(pref==="spi"?"spirit":pref)))) { valEl.classList.add('highlight-val'); lbl.classList.add('highlight-text'); }
                 else { valEl.classList.remove('highlight-val'); lbl.classList.remove('highlight-text'); }
             });
-            document.getElementById('p-selected').innerText = passives.season5_passive || "None";
+
+            let selected = passives.season5_passive || "None";
+            document.getElementById('p-selected').innerText = selected === "Unknown" ? "Locked" : selected;
+            
             const container = document.getElementById('p-available-container');
             container.innerHTML = "";
             (passives.available_passives || []).forEach((p, i) => {
                 const wrapper = document.createElement('span');
-                wrapper.innerHTML = `<span class="win-prefix">${i==0?"100w: ":(i==1?"200w: ":"")}</span><span class="passive-highlight">${p.name}</span>${i < passives.available_passives.length-1 ? '<span class="separator">,</span>' : ''}`;
+                const pName = p.name === "Unknown" ? "Locked" : p.name;
+                wrapper.innerHTML = `<span class="win-prefix">${i==0?"100w: ":(i==1?"200w: ":"")}</span><span class="passive-highlight">${pName}</span>${i < passives.available_passives.length-1 ? '<span class="separator">,</span>' : ''}`;
                 container.appendChild(wrapper);
             });
         }).catch(e => console.warn(e));
@@ -256,8 +347,7 @@
                 const data = JSON.parse(text), stats = data.new_stats_after_ascend || {};
                 document.getElementById('toast-player').innerText = data.player_name || "PLAYER";
                 ['hp','atk','mag','spi'].forEach(s => document.getElementById('t-'+s).innerText = formatStat(stats[s === 'atk' ? 'attack' : (s === 'mag' ? 'magic' : (s === 'spi' ? 'spirit' : s))]));
-                toastQueue.push({ id: 'ascend-toast', duration: 8000 });
-                processQueue();
+                showPriorityToast('ascend-toast', 8000);
             }
             lastAscendContent = text;
         });
@@ -272,8 +362,7 @@
                     document.getElementById('fh-unit').innerText = data.freehire_character;
                     const match = csvMapping.find(m => m.id === data.freehire_character);
                     if (match) { document.getElementById('fh-unit-icon').src = `units/${match.file}.png`; document.getElementById('fh-unit-icon').style.display = 'block'; }
-                    toastQueue.push({ id: 'freehire-toast', duration: 8000 });
-                    processQueue();
+                    showPriorityToast('freehire-toast', 8000);
                 }
             }
             lastFreehireContent = rawText;
@@ -285,26 +374,31 @@
             if (lastMissingContent !== null && text !== lastMissingContent) {
                 const data = JSON.parse(text);
                 const list = (data.missing_characters.all_missing || []).sort();
-                const scrollList = document.getElementById('missing-scroll-list');
-                document.getElementById('missing-count').innerText = data.missing_characters.total_missing_count || 0;
-                scrollList.innerHTML = "";
-                list.forEach(name => {
-                    const match = csvMapping.find(m => m.id === name);
-                    const item = document.createElement('div');
-                    item.className = 'scroll-item';
-                    item.innerHTML = `${match ? `<img src="units/${match.file}.png" class="mini-icon">` : `<div style="width:24px"></div>`} <span>${name}</span>`;
-                    scrollList.appendChild(item);
-                });
+                const count = data.missing_characters.total_missing_count || 0;
                 
-                const rowCount = Math.ceil(list.length / 2);
-                const visibleRows = 6; // Matching container height (240px / 40px)
-                const scrollDist = Math.max(0, (rowCount - visibleRows) * 40);
-                scrollList.style.setProperty('--scroll-dist', `-${scrollDist}px`);
-                
-                const scrollDuration = Math.max(1, (rowCount - visibleRows) * 1.5);
-                scrollList.style.animationDuration = `${scrollDuration}s`;
-                
-                toastQueue.push({ id: 'missing-toast', duration: (2 + scrollDuration + 2) * 1000 });
+                if (count === 0 || list.length === 0) {
+                    document.getElementById('success-player').innerText = data.player_name || "PLAYER";
+                    toastQueue.push({ id: 'missing-toast', duration: 8000, isSuccess: true });
+                } else {
+                    document.getElementById('missing-count').innerText = count;
+                    const scrollList = document.getElementById('missing-scroll-list');
+                    scrollList.innerHTML = "";
+                    list.forEach(name => {
+                        const match = csvMapping.find(m => m.id === name);
+                        const item = document.createElement('div');
+                        item.className = 'scroll-item';
+                        item.innerHTML = `${match ? `<img src="units/${match.file}.png" class="mini-icon">` : `<div style="width:24px"></div>`} <span>${name}</span>`;
+                        scrollList.appendChild(item);
+                    });
+                    
+                    const rowCount = Math.ceil(list.length / 2);
+                    const scrollDist = Math.max(0, (rowCount - 6) * 40);
+                    scrollList.style.setProperty('--scroll-dist', `-${scrollDist}px`);
+                    const durationVal = Math.max(1, (rowCount - 6) * 1.5);
+                    scrollList.style.animationDuration = `${durationVal}s`;
+                    
+                    toastQueue.push({ id: 'missing-toast', duration: (2 + durationVal + 2) * 1000, isSuccess: false });
+                }
                 processQueue();
             }
             lastMissingContent = text;
